@@ -44,6 +44,17 @@ class AccountFoundationTests(TestCase):
             set(field.choices),
             {('customer', 'Customer'), ('business', 'Business')},
         )
+        self.assertIn('type', User.REQUIRED_FIELDS)
+
+    def test_database_restricts_user_role_values(self):
+        from django.db import IntegrityError, transaction
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            User.objects.create(
+                username='invalid-role',
+                email='invalid-role@example.com',
+                type='admin',
+            )
 
     def test_usernames_and_emails_have_case_insensitive_database_constraints(self):
         constraints = {constraint.name for constraint in User._meta.constraints}

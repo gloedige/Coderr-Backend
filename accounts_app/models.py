@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 
 
 class User(AbstractUser):
@@ -9,9 +10,14 @@ class User(AbstractUser):
 
     email = models.EmailField(unique=True)
     type = models.CharField(max_length=10, choices=UserType.choices)
+    REQUIRED_FIELDS = ['email', 'type']
 
     class Meta:
         constraints = [
+            models.CheckConstraint(
+                condition=Q(type__in=['customer', 'business']),
+                name='accounts_user_type_valid',
+            ),
             models.UniqueConstraint(
                 models.functions.Lower('username'),
                 name='accounts_user_username_ci_unique',

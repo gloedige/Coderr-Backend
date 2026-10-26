@@ -5,11 +5,16 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-local-development-only-change-before-deployment',
-)
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        from django.core.exceptions import ImproperlyConfigured
+
+        raise ImproperlyConfigured(
+            'Set DJANGO_SECRET_KEY when DJANGO_DEBUG is false.'
+        )
+    SECRET_KEY = 'django-insecure-local-development-only-change-before-deployment'
 ALLOWED_HOSTS = [
     host
     for host in os.environ.get(

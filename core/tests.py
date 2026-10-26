@@ -24,3 +24,5 @@ class ProjectFoundationTests(SimpleTestCase):
         self.assertIn('accounts_app', settings.INSTALLED_APPS)
         self.assertIn('marketplace_app', settings.INSTALLED_APPS)
 
+
+

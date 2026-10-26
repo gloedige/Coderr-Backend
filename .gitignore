@@ -223,3 +223,7 @@ __marimo__/
 
 #Refernce project files
 _reference/
+
+#API html Doku
+api-doku.html
+/api-doku_files

@@ -1,20 +1,23 @@
 # Coderr API-Spezifikation
 
-Diese Spezifikation wurde aus [api-doku.html](api-doku.html) abgeleitet. Sie beschreibt die dort dokumentierten Endpunkte und Beispielantworten.
+Diese Spezifikation wurde aus [api-doku.html](../api-doku.html) abgeleitet und um die abgestimmten Implementierungsregeln ergänzt. Sie beschreibt alle Endpunkte, Antwortformate, Berechtigungen und Validierungsregeln.
 
 ## Allgemeines
 
 - **API-Präfix:** `/api/`
-- **Datenformat:** JSON
-- **Authentifizierung:** Geschützte Endpunkte setzen ein Authentifizierungs-Token voraus. Die HTML-Dokumentation legt das genaue Header-Format nicht fest.
+- **Datenformat:** JSON, sofern für Datei-Uploads nicht ausdrücklich `multipart/form-data` angegeben ist.
+- **Authentifizierung:** DRF-Tokenauthentifizierung über `Authorization: Token <token>`. Registrierung, Login, öffentliche Angebotsliste und Basisinformationen sind nicht authentifizierungspflichtig; für andere Endpunkte gelten die jeweiligen Angaben.
 - **Ratenbegrenzung:** Für die dokumentierten Endpunkte ist kein Limit angegeben.
 - Pfadparameter in geschweiften Klammern, z. B. `{id}`, müssen durch den jeweiligen Wert ersetzt werden.
 - Datumswerte werden als ISO-8601-Strings zurückgegeben.
+- Benutzerrollen sind `customer` und `business`. Username und E-Mail werden nach äußerem Whitespace-Trim case-insensitiv als eindeutig behandelt.
+- Fehler bei ungültigen Eingaben verwenden DRF-Feldfehler. Authentifizierungs-, Berechtigungs- und Nichtgefunden-Fehler verwenden ein JSON-Objekt mit `detail`. Interne Fehlerdetails werden nicht zurückgegeben.
+- Datei-Uploads akzeptieren JPEG und PNG bis maximal 5 MB. Responses enthalten nur den Dateinamen, keine URL. Bei PATCH bedeutet ein ausgelassenes Bildfeld „unverändert“; der Multipart-Textwert `null` löscht das Bild.
 
 ## Authentifizierung
 
 ### `POST /api/registration/`
-Erstellt ein Benutzerkonto vom Typ `customer` oder `business`. Keine Authentifizierung erforderlich.
+Erstellt atomar Benutzerkonto, gemeinsames Profil und Authentifizierungstoken für `customer` oder `business`. Keine Authentifizierung erforderlich. Username und E-Mail werden außen getrimmt und case-insensitiv eindeutig gespeichert. Das Passwort muss mindestens 4 Zeichen lang sein; zusätzliche Django-Passwortregeln werden nicht angewendet. `password` und `repeated_password` müssen übereinstimmen.
 
 **Request Body**
 
@@ -22,8 +25,8 @@ Erstellt ein Benutzerkonto vom Typ `customer` oder `business`. Keine Authentifiz
 {
   "username": "exampleUsername",
   "email": "example@mail.de",
-  "password": "examplePassword",
-  "repeated_password": "examplePassword",
+  "password": "pass",
+  "repeated_password": "pass",
   "type": "customer"
 }
 ```
@@ -39,10 +42,10 @@ Erstellt ein Benutzerkonto vom Typ `customer` oder `business`. Keine Authentifiz
 }
 ```
 
-Weitere Statuscodes: `400` ungültige Anfragedaten, `500` interner Serverfehler.
+Weitere Statuscodes: `400` ungültige Anfragedaten (einschließlich doppeltem Username/E-Mail oder abweichender Passwörter), `500` interner Serverfehler. Ein Fehler während der Anlage darf weder Teilkonto noch ungebundenes Token hinterlassen.
 
 ### `POST /api/login/`
-Authentifiziert einen Benutzer und liefert ein Token. Keine Authentifizierung erforderlich.
+Authentifiziert einen Benutzer und liefert ein Token. Der Username-Login ist case-insensitiv. Keine Authentifizierung erforderlich.
 
 **Request Body**
 
@@ -64,12 +67,12 @@ Authentifiziert einen Benutzer und liefert ein Token. Keine Authentifizierung er
 }
 ```
 
-Weitere Statuscodes: `400` ungültige Anfragedaten, `500` interner Serverfehler.
+Weitere Statuscodes: `400` fehlende oder ungültige Anmeldedaten, `500` interner Serverfehler. Die Fehlerantwort darf nicht offenlegen, ob Username oder Passwort falsch war.
 
 ## Profile
 
 ### `GET /api/profile/{pk}/`
-Liefert das vollständige Profil des Benutzers `{pk}`. Authentifizierung erforderlich.
+Liefert das vollständige Profil des Benutzers `{pk}`. Authentifizierung erforderlich. Nicht vorhandene optionale Textfelder werden als `""` statt `null` ausgegeben. `file` ist der gespeicherte Basis-Dateiname oder `null`, falls kein Bild vorhanden ist.
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -93,9 +96,11 @@ Liefert das vollständige Profil des Benutzers `{pk}`. Authentifizierung erforde
 Die Felder `first_name`, `last_name`, `location`, `tel`, `description` und `working_hours` sollen nicht `null` sein; bei fehlenden Werten werden leere Strings verwendet. Weitere Statuscodes: `401` nicht authentifiziert, `404` Profil nicht gefunden, `500` interner Serverfehler.
 
 ### `PATCH /api/profile/{pk}/`
-Aktualisiert ausgewählte Profildaten. Benutzer dürfen ausschließlich ihr eigenes Profil bearbeiten; Authentifizierung erforderlich.
+Aktualisiert ausgewählte Profildaten des eigenen Kontos; fremde Profile dürfen nicht bearbeitet werden. `username` und `type` sind nicht änderbar. Gemeinsame editierbare Felder sind `first_name`, `last_name`, `location`, `tel` und `email`. `description` und `working_hours` sind nur für Business-Profile editierbar. Nicht übermittelte Felder bleiben unverändert. E-Mail-Eindeutigkeit ist case-insensitiv.
 
-**Request Body** (alle gezeigten Felder sind Beispiele für änderbare Felder)
+Für Bilddateien wird `multipart/form-data` verwendet. `file` enthält JPEG/PNG bis 5 MB. Bei ausgelassenem Feld bleibt das aktuelle Bild bestehen; der Multipart-Textwert `null` entfernt es. JSON-Feldwerte werden bei Multipart als Textfelder übertragen. Ungültige Dateiformate oder zu große Dateien ergeben `400`.
+
+**Request Body** (JSON ohne Bilddatei; mit Bilddatei als `multipart/form-data`)
 
 ```json
 {
@@ -109,7 +114,7 @@ Aktualisiert ausgewählte Profildaten. Benutzer dürfen ausschließlich ihr eige
 }
 ```
 
-**Erfolgreiche Antwort – `200 OK`**: aktualisiertes Profil im selben Format wie bei `GET /api/profile/{pk}/`.
+**Erfolgreiche Antwort – `200 OK`**: aktualisiertes Profil im selben Format wie bei `GET /api/profile/{pk}/`. `file` enthält nur den Basis-Dateinamen oder `null`, wenn kein Bild vorhanden ist.
 
 Weitere Statuscodes: `401` nicht authentifiziert, `403` nicht Eigentümer des Profils, `404` Profil nicht gefunden, `500` interner Serverfehler.
 
@@ -138,7 +143,7 @@ Liefert eine Liste der Geschäftsnutzer. Authentifizierung erforderlich.
 Weitere Statuscodes: `401` nicht authentifiziert, `500` interner Serverfehler.
 
 ### `GET /api/profiles/customer/`
-Liefert eine Liste der Kundenprofile. Authentifizierung erforderlich.
+Liefert eine Liste der Kundenprofile. Authentifizierung erforderlich. `uploaded_at` bezeichnet den letzten Profilbild-Upload, bleibt nur in diesem Kundenlisten-Response enthalten und ist `null`, wenn noch kein Profilbild hochgeladen wurde.
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -161,18 +166,18 @@ Weitere Statuscodes: `401` nicht authentifiziert, `500` interner Serverfehler.
 ## Angebote
 
 ### `GET /api/offers/`
-Liefert Angebote mit Angebotsdetails, Mindestpreis und kürzester Lieferzeit. Keine Authentifizierung erforderlich. Die Antwort ist paginiert (PageNumberPagination).
+Liefert Angebote mit Angebotsdetails, Mindestpreis und kürzester Lieferzeit. Keine Authentifizierung erforderlich. Die Antwort ist paginiert (PageNumberPagination); Standardgröße ist 3, maximal 100 Ergebnisse. Größere `page_size`-Werte werden auf 100 begrenzt. `ordering` akzeptiert `updated_at`, `-updated_at`, `min_price` oder `-min_price`; Standard ist `-updated_at`. `min_price` ist ein inklusiver Mindestpreisfilter; `max_delivery_time` ist inklusiv. `search` sucht case-insensitiv in `title` und `description`. Ungültige oder unbekannte Parameter ergeben `400`.
 
 **Query-Parameter**
 
 | Parameter | Typ | Beschreibung |
 | --- | --- | --- |
 | `creator_id` | integer | Filtert nach dem Ersteller des Angebots. |
-| `min_price` | float | Filtert nach einem Mindestpreis. |
+| `min_price` | decimal | Inklusiver Mindestpreisfilter. Preiswerte haben höchstens zwei Dezimalstellen. |
 | `max_delivery_time` | integer | Filtert nach Lieferzeit kleiner oder gleich dem Wert. |
-| `ordering` | string | Sortierung nach `updated_at` oder `min_price`. |
+| `ordering` | string | Sortierung nach `updated_at`, `-updated_at`, `min_price` oder `-min_price`. Standard: `-updated_at`. |
 | `search` | string | Durchsucht `title` und `description`. |
-| `page_size` | integer | Anzahl der Ergebnisse pro Seite. |
+| `page_size` | integer | Ergebnisse pro Seite; Standard 3, Maximum 100 (größere Werte werden auf 100 begrenzt). |
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -210,9 +215,11 @@ Liefert Angebote mit Angebotsdetails, Mindestpreis und kürzester Lieferzeit. Ke
 Weitere Statuscodes: `400` ungültige Anfrageparameter, `500` interner Serverfehler.
 
 ### `POST /api/offers/`
-Erstellt ein Angebot. Erfordert Authentifizierung; nur Benutzer vom Typ `business` dürfen Angebote erstellen. Ein Angebot muss drei Angebotsdetails enthalten.
+Erstellt ein Angebot. Erfordert Authentifizierung; nur Benutzer vom Typ `business` dürfen Angebote erstellen. Ein Angebot muss genau drei Angebotsdetails enthalten: jeweils eines mit `offer_type` `basic`, `standard` und `premium`. `title` ist erforderlich, nicht leer und maximal 150 Zeichen. `description` ist maximal 500 Zeichen. Der Preis jedes Details muss größer als 0 und höchstens 100000 sein, mit maximal zwei Dezimalstellen. `delivery_time_in_days` liegt zwischen 1 und 365; `revisions` zwischen 0 und 100. `features` ist eine Liste frei formulierter Texte und darf leer sein; es gibt keine vorgegebenen Textbausteine.
 
-**Request Body**
+Der Request verwendet `multipart/form-data`, wenn ein Bild hochgeladen wird. Die Angebotsdetails werden als JSON-kodierter Textwert im Feld `details` übertragen. `image` akzeptiert JPEG/PNG bis 5 MB. Ohne Bild ist `image` `null`; Responses enthalten bei vorhandenem Bild nur den Dateinamen.
+
+**Request Body** (`application/json`, wenn kein Bild hochgeladen wird; andernfalls `multipart/form-data` mit JSON-kodiertem Feld `details`)
 
 ```json
 {
@@ -253,7 +260,7 @@ Erstellt ein Angebot. Erfordert Authentifizierung; nur Benutzer vom Typ `busines
 Weitere Statuscodes: `400` ungültige oder unvollständige Anfragedaten, `401` nicht authentifiziert, `403` kein Business-Profil, `500` interner Serverfehler.
 
 ### `GET /api/offers/{id}/`
-Liefert ein einzelnes Angebot und dessen Detail-URLs. Authentifizierung erforderlich.
+Liefert ein einzelnes Angebot und dessen Detail-URLs. Authentifizierung erforderlich. Bildantworten enthalten den Dateinamen, nicht die URL. Die drei Detail-URLs referenzieren `GET /api/offerdetails/{id}/`.
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -279,9 +286,9 @@ Liefert ein einzelnes Angebot und dessen Detail-URLs. Authentifizierung erforder
 Weitere Statuscodes: `401` nicht authentifiziert, `404` Angebot nicht gefunden, `500` interner Serverfehler.
 
 ### `PATCH /api/offers/{id}/`
-Aktualisiert nur die übermittelten Angebotsfelder. Nur der Ersteller darf das Angebot bearbeiten. Bei Detailänderungen sollen die bestehenden IDs erhalten bleiben und `offer_type` mitgesendet werden.
+Aktualisiert nur die übermittelten Angebotsfelder. Nur der Ersteller darf das Angebot bearbeiten. Bei Detailänderungen identifiziert `offer_type` (`basic`, `standard`, `premium`) die bestehende Stufe. IDs bleiben erhalten; ausgelassene Felder und Stufen bleiben unverändert. Pflichtfelder dürfen nicht `null` sein. Ein mitgesendetes `features`-Array ersetzt die bisherige Liste. Stufen können nicht entfernt werden. Für Bild-Uploads wird Multipart verwendet: `details` ist ein JSON-kodierter Textwert; ausgelassenes `image` lässt das Bild unverändert, `image: null` löscht es. Zulässige Bildformate und Größen entsprechen dem POST-Endpunkt.
 
-**Request Body**
+**Request Body** (`application/json`, wenn kein Bild hochgeladen oder gelöscht wird; andernfalls `multipart/form-data` mit JSON-kodiertem Feld `details`)
 
 ```json
 {
@@ -304,7 +311,7 @@ Aktualisiert nur die übermittelten Angebotsfelder. Nur der Ersteller darf das A
 Weitere Statuscodes: `400` ungültige oder unvollständige Anfragedaten, `401` nicht authentifiziert, `403` nicht Ersteller, `404` Angebot nicht gefunden, `500` interner Serverfehler.
 
 ### `DELETE /api/offers/{id}/`
-Löscht ein Angebot. Nur der Ersteller darf es löschen; Authentifizierung erforderlich.
+Löscht ein Angebot. Nur der Ersteller darf es löschen; Authentifizierung erforderlich. Bereits angelegte Bestellungen enthalten einen Snapshot der gekauften Angebotsdetails und bleiben durch eine Angebotslöschung unverändert.
 
 **Erfolgreiche Antwort – `204 No Content`** (ohne Response-Body).
 
@@ -332,7 +339,7 @@ Weitere Statuscodes: `401` nicht authentifiziert, `404` Angebotsdetail nicht gef
 ## Bestellungen
 
 ### `GET /api/orders/`
-Liefert Bestellungen, bei denen der angemeldete Benutzer Kunde oder Geschäftspartner ist. Authentifizierung erforderlich.
+Liefert Bestellungen, bei denen der angemeldete Benutzer Kunde oder Geschäftspartner ist, neueste zuerst. Authentifizierung erforderlich. Bestellungen anderer Benutzer werden nicht zurückgegeben.
 
 **Erfolgreiche Antwort – `200 OK`**: Liste mit Bestellungen im folgenden Format.
 
@@ -358,7 +365,7 @@ Liefert Bestellungen, bei denen der angemeldete Benutzer Kunde oder Geschäftspa
 Weitere Statuscodes: `401` nicht authentifiziert, `500` interner Serverfehler.
 
 ### `POST /api/orders/`
-Erstellt eine Bestellung auf Grundlage eines Angebotsdetails. Nur authentifizierte Benutzer vom Typ `customer` dürfen Bestellungen erstellen.
+Erstellt eine Bestellung auf Grundlage eines Angebotsdetails. Nur authentifizierte Benutzer vom Typ `customer` dürfen Bestellungen erstellen. Selbstbestellungen (Kauf eines eigenen Angebots) sind nicht zulässig. Bestellfelder wie Titel, Preis, Features, Typ, Revisionen und Lieferzeit werden als Snapshot gespeichert; spätere Änderungen oder Löschungen des Angebots ändern die Bestellung nicht. Der Status startet als `in_progress`.
 
 **Request Body**
 
@@ -373,7 +380,7 @@ Erstellt eine Bestellung auf Grundlage eines Angebotsdetails. Nur authentifizier
 Weitere Statuscodes: `400` fehlende oder ungültige Angebotsdetail-ID, `401` nicht authentifiziert, `403` keine Kundenrolle, `404` Angebotsdetail nicht gefunden, `500` interner Serverfehler.
 
 ### `PATCH /api/orders/{id}/`
-Aktualisiert den Status einer Bestellung. Laut Dokumentation kann ein Business-Benutzer den Status aktualisieren. Als mögliche Werte werden `in_progress`, `completed` und `cancelled` genannt.
+Aktualisiert den Status einer Bestellung. Nur der zugeordnete Business-Benutzer darf aktualisieren. Zulässig sind ausschließlich Übergänge von `in_progress` nach `completed` oder `cancelled`; beide Zielstatus sind endgültig. Andere Statusübergänge sowie Änderungen an anderen Feldern sind unzulässig.
 
 **Request Body**
 
@@ -395,7 +402,7 @@ Löscht eine Bestellung. Nur Admin-Benutzer (Staff) dürfen diese Aktion ausfüh
 Weitere Statuscodes: `401` nicht authentifiziert, `403` keine Berechtigung, `404` Bestellung nicht gefunden, `500` interner Serverfehler.
 
 ### `GET /api/order-count/{business_user_id}/`
-Liefert die Anzahl der Bestellungen des Geschäftsnutzers mit Status `in_progress`. Authentifizierung erforderlich.
+Liefert die Anzahl der Bestellungen des Geschäftsnutzers mit Status `in_progress`. Jeder authentifizierte Benutzer darf den Endpunkt aufrufen.
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -408,7 +415,7 @@ Liefert die Anzahl der Bestellungen des Geschäftsnutzers mit Status `in_progres
 Weitere Statuscodes: `401` nicht authentifiziert, `404` Geschäftsnutzer nicht gefunden, `500` interner Serverfehler.
 
 ### `GET /api/completed-order-count/{business_user_id}/`
-Liefert die Anzahl der abgeschlossenen Bestellungen des Geschäftsnutzers. Authentifizierung erforderlich.
+Liefert die Anzahl der abgeschlossenen Bestellungen des Geschäftsnutzers. Jeder authentifizierte Benutzer darf den Endpunkt aufrufen.
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -423,7 +430,7 @@ Weitere Statuscodes: `401` nicht authentifiziert, `404` Geschäftsnutzer nicht g
 ## Bewertungen
 
 ### `GET /api/reviews/`
-Liefert Bewertungen; Filterung und Sortierung sind möglich. Authentifizierung erforderlich.
+Liefert Bewertungen; alle authentifizierten Benutzer dürfen lesen. Filterung und Sortierung sind möglich. `ordering` akzeptiert `updated_at`, `-updated_at`, `rating` und `-rating`. Ungültige Filter- oder Sortierparameter ergeben `400`.
 
 **Query-Parameter**
 
@@ -431,7 +438,7 @@ Liefert Bewertungen; Filterung und Sortierung sind möglich. Authentifizierung e
 | --- | --- | --- |
 | `business_user_id` | integer | Filtert nach dem bewerteten Geschäftsnutzer. |
 | `reviewer_id` | integer | Filtert nach dem Benutzer, der die Bewertung erstellt hat. |
-| `ordering` | string | Sortierung nach `updated_at` oder `rating`. |
+| `ordering` | string | Sortierung nach `updated_at`, `-updated_at`, `rating` oder `-rating`. |
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -449,10 +456,10 @@ Liefert Bewertungen; Filterung und Sortierung sind möglich. Authentifizierung e
 ]
 ```
 
-Weitere Statuscodes: `401` nicht authentifiziert, `500` interner Serverfehler.
+Weitere Statuscodes: `400` ungültige Filter- oder Sortierparameter, `401` nicht authentifiziert, `500` interner Serverfehler.
 
 ### `POST /api/reviews/`
-Erstellt eine Bewertung für einen Geschäftsnutzer. Nur authentifizierte Benutzer mit Kundenprofil dürfen Bewertungen erstellen; pro Geschäftsnutzer ist eine Bewertung je Benutzer möglich.
+Erstellt eine Bewertung für einen Geschäftsnutzer. Nur authentifizierte Kunden dürfen bewerten; der Kunde muss mindestens eine abgeschlossene Bestellung beim angegebenen Geschäftsnutzer haben. Pro Kunden-/Business-Paar darf höchstens eine aktive Bewertung existieren. Gelöschte Bewertungen blockieren keine neue Bewertung. `rating` ist eine ganze Zahl von 1 bis 5; `description` ist nicht leer und maximal 500 Zeichen. Wird die qualifizierende Bestellung später gelöscht, bleibt die Bewertung erhalten.
 
 **Request Body**
 
@@ -469,7 +476,7 @@ Erstellt eine Bewertung für einen Geschäftsnutzer. Nur authentifizierte Benutz
 Weitere Statuscodes: `400` fehlerhafte Anfrage oder bereits vorhandene Bewertung, `401` nicht authentifiziert/kein Kundenprofil, `403` keine Berechtigung, `500` interner Serverfehler.
 
 ### `PATCH /api/reviews/{id}/`
-Aktualisiert eine Bewertung. Nur der Ersteller darf sie bearbeiten; editierbar sind `rating` und `description`.
+Aktualisiert eine Bewertung. Nur der Ersteller darf sie bearbeiten; editierbar sind ausschließlich `rating` (ganze Zahl von 1 bis 5) und `description` (1 bis 500 Zeichen).
 
 **Request Body**
 
@@ -494,7 +501,7 @@ Weitere Statuscodes: `401` nicht authentifiziert, `403` keine Berechtigung, `404
 ## Übergreifende Informationen
 
 ### `GET /api/base-info/`
-Liefert öffentliche aggregierte Basisinformationen zur Plattform. Keine Authentifizierung erforderlich. `average_rating` wird über alle Bewertungen berechnet und auf eine Dezimalstelle gerundet.
+Liefert öffentliche aggregierte Basisinformationen zur Plattform. Keine Authentifizierung erforderlich. `average_rating` wird über alle Bewertungen berechnet und auf eine Dezimalstelle gerundet; wenn noch keine Bewertungen vorhanden sind, ist der Wert `0.0`.
 
 **Erfolgreiche Antwort – `200 OK`**
 

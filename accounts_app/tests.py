@@ -56,11 +56,42 @@ class AccountFoundationTests(TestCase):
                 type='admin',
             )
 
-    def test_usernames_and_emails_have_case_insensitive_database_constraints(self):
-        constraints = {constraint.name for constraint in User._meta.constraints}
+    def test_username_case_is_preserved_and_email_is_normalized(self):
+        user = User.objects.create_user(
+            username='  neuerNutzer  ',
+            email='Mixed.Email@Example.com',
+            password='pass',
+            type=User.UserType.CUSTOMER,
+        )
 
-        self.assertIn('accounts_user_username_ci_unique', constraints)
-        self.assertIn('accounts_user_email_ci_unique', constraints)
+        self.assertEqual(user.username, 'neuerNutzer')
+        self.assertEqual(user.email, 'mixed.email@example.com')
+
+    def test_case_insensitive_duplicates_are_rejected(self):
+        from django.db import IntegrityError, transaction
+
+        User.objects.create_user(
+            username='UniqueName',
+            email='unique@example.com',
+            password='pass',
+            type=User.UserType.CUSTOMER,
+        )
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            User.objects.create_user(
+                username='UNIQUENAME',
+                email='different@example.com',
+                password='pass',
+                type=User.UserType.BUSINESS,
+            )
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            User.objects.create_user(
+                username='differentname',
+                email='UNIQUE@example.com',
+                password='pass',
+                type=User.UserType.BUSINESS,
+            )
 
     def test_profile_image_uses_uploads_directory(self):
         field = Profile._meta.get_field('file')

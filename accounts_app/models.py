@@ -19,14 +19,15 @@ class User(AbstractUser):
                 name='accounts_user_type_valid',
             ),
             models.UniqueConstraint(
-                models.functions.Lower('username'),
+                models.functions.Collate('username', 'NOCASE'),
                 name='accounts_user_username_ci_unique',
             ),
-            models.UniqueConstraint(
-                models.functions.Lower('email'),
-                name='accounts_user_email_ci_unique',
-            ),
         ]
+
+    def save(self, *args, **kwargs):
+        self.username = self.username.strip()
+        self.email = self.email.strip().lower()
+        super().save(*args, **kwargs)
 
 
 class Profile(models.Model):

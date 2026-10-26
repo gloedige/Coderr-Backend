@@ -75,3 +75,19 @@ When the shape of that interface is itself in question (how deep the module is, 
 - Dieses Projekt orientiert sich an der Architektur und den Standards aus dem Ordner `_reference/`.
 - Nutze dieselbe Ordnerstruktur, Naming Conventions und Patterns (z. B. permissions, serializers, views, urls, models).
 - Achte darauf, dass neuer Code nach den gleichen Prinzipien aufgebaut wird wie im Referenzprojekt.
+
+
+# API-Dokumentation
+
+- die API Dokumentation befindet sich in der `api-specs.md` Datei.
+
+
+# Autonomes Arbeiten
+
+- Arbeite bei Implementierungsaufträgen standardmäßig autonom und führe die Aufgabe bis zu einem überprüften Ergebnis aus. Erkunde dafür selbstständig den Workspace, setze passende Defaults aus Projektmustern und Dokumentation ein, ändere Dateien, führe geeignete Tests/Checks aus und behebe dadurch verursachte Fehler.
+- Stelle keine Rückfragen für Entscheidungen, die sich aus bestätigten Anforderungen, dieser Datei, der API-Spezifikation oder bestehenden Projektmustern ableiten lassen. Bereits vom Nutzer bestätigte Entscheidungen nicht erneut abfragen.
+- Wenn ein Detail offen, aber nicht blockierend ist, wähle eine sichere, konventionelle Lösung, dokumentiere die Annahme knapp im Abschlussbericht und arbeite weiter.
+- Unterteile größere Vorhaben in kleine, vertikale, reviewbare Schritte. Berichte kurz über Fortschritt und Ergebnisse, aber halte nicht nach jedem Schritt an, um eine Bestätigung einzuholen.
+- Frage nur dann nach, wenn eine echte, nicht auflösbare Blockade besteht oder eine Entscheidung erhebliche, irreversible Folgen hat (z. B. Löschen/Überschreiben von Nutzerdaten, Veröffentlichung, produktive Bereitstellung, Kosten oder Umgang mit Geheimnissen). Beschreibe dann knapp die konkrete Blockade und frage nur das Nötigste.
+- Die Grilling-Anleitung oben wird ausschließlich ausgeführt, wenn der Nutzer ausdrücklich darum bittet, eine Idee/einen Plan zu „grillen“ oder zu stress-testen. Sie gilt nicht für normale Umsetzungsaufträge und hebt den autonomen Arbeitsstandard nicht auf.
+- Vorhandene Branch-/Review-Vereinbarungen beachten: Änderungen in der vereinbarten Gruppe und in kleinen Tickets bündeln; keine Commits, Pushes, Merges oder GitHub-Issue-Erstellung ohne ausdrücklichen Auftrag.

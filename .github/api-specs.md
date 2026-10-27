@@ -10,14 +10,14 @@ Diese Spezifikation wurde aus [api-doku.html](../api-doku.html) abgeleitet und u
 - **Ratenbegrenzung:** Für die dokumentierten Endpunkte ist kein Limit angegeben.
 - Pfadparameter in geschweiften Klammern, z. B. `{id}`, müssen durch den jeweiligen Wert ersetzt werden.
 - Datumswerte werden als ISO-8601-Strings zurückgegeben.
-- Benutzerrollen sind `customer` und `business`. Username und E-Mail werden nach äußerem Whitespace-Trim case-insensitiv als eindeutig behandelt.
+- Benutzerrollen sind `customer` und `business`. Usernames werden nach äußerem Whitespace-Trim case-sensitiv eindeutig behandelt und behalten ihre Schreibweise. E-Mail-Adressen werden außen getrimmt, kleingeschrieben und case-insensitiv eindeutig behandelt.
 - Fehler bei ungültigen Eingaben verwenden DRF-Feldfehler. Authentifizierungs-, Berechtigungs- und Nichtgefunden-Fehler verwenden ein JSON-Objekt mit `detail`. Interne Fehlerdetails werden nicht zurückgegeben.
 - Datei-Uploads akzeptieren JPEG und PNG bis maximal 5 MB. Responses enthalten nur den Dateinamen, keine URL. Bei PATCH bedeutet ein ausgelassenes Bildfeld „unverändert“; der Multipart-Textwert `null` löscht das Bild.
 
 ## Authentifizierung
 
 ### `POST /api/registration/`
-Erstellt atomar Benutzerkonto, gemeinsames Profil und Authentifizierungstoken für `customer` oder `business`. Keine Authentifizierung erforderlich. Username und E-Mail werden außen getrimmt und case-insensitiv eindeutig gespeichert. Das Passwort muss mindestens 4 Zeichen lang sein; zusätzliche Django-Passwortregeln werden nicht angewendet. `password` und `repeated_password` müssen übereinstimmen.
+Erstellt atomar Benutzerkonto, gemeinsames Profil und Authentifizierungstoken für `customer` oder `business`. Keine Authentifizierung erforderlich. Username und E-Mail werden außen getrimmt. Der Username bleibt case-sensitiv und muss exakt eindeutig sein; die E-Mail wird kleingeschrieben und case-insensitiv eindeutig behandelt. Das Passwort muss mindestens 4 Zeichen lang sein; zusätzliche Django-Passwortregeln werden nicht angewendet. `password` und `repeated_password` müssen übereinstimmen.
 
 **Request Body**
 
@@ -45,7 +45,7 @@ Erstellt atomar Benutzerkonto, gemeinsames Profil und Authentifizierungstoken f�
 Weitere Statuscodes: `400` ungültige Anfragedaten (einschließlich doppeltem Username/E-Mail oder abweichender Passwörter), `500` interner Serverfehler. Ein Fehler während der Anlage darf weder Teilkonto noch ungebundenes Token hinterlassen.
 
 ### `POST /api/login/`
-Authentifiziert einen Benutzer und liefert ein Token. Der Username-Login ist case-insensitiv. Keine Authentifizierung erforderlich.
+Authentifiziert einen Benutzer und liefert ein Token. Der Username-Login ist case-sensitiv; die beim Login angegebene Schreibweise muss mit dem gespeicherten Username übereinstimmen. Keine Authentifizierung erforderlich.
 
 **Request Body**
 

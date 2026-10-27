@@ -76,7 +76,16 @@ class OrderStatusUpdateSerializer(serializers.Serializer):
         return attrs
 
     def update_status(self):
+        from django.utils import timezone
+
         order = self.context['order']
-        order.status = self.validated_data['status']
-        order.save(update_fields=['status', 'updated_at'])
+        updated = Order.objects.filter(
+            pk=order.pk,
+            status=Order.Status.IN_PROGRESS,
+        ).update(status=self.validated_data['status'], updated_at=timezone.now())
+        if not updated:
+            raise serializers.ValidationError(
+                {'status': 'This status transition is not allowed.'}
+            )
+        order.refresh_from_db()
         return order

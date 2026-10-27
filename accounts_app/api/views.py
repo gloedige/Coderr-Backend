@@ -2,6 +2,7 @@ import logging
 
 from django.db import transaction
 from rest_framework import status
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -31,6 +32,8 @@ class RegistrationView(APIView):
         try:
             with transaction.atomic():
                 user, token = serializer.save()
+        except APIException:
+            raise
         except Exception:
             logger.exception('Registration failed due to an internal error.')
             return Response(

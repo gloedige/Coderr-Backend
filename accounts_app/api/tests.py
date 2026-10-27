@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django.test import TestCase
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
@@ -67,6 +68,30 @@ class AuthenticationEndpointTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['username'], 'NEUERnutzer')
         self.assertTrue(User.objects.filter(username='NEUERnutzer').exists())
+
+    def test_registration_returns_400_for_concurrent_duplicate_insert(self):
+        with patch(
+            'accounts_app.api.serializers.User.objects.create_user',
+            side_effect=IntegrityError('unique constraint race'),
+        ):
+            response = self.client.post(
+                '/api/registration/',
+                {
+                    'username': 'racing-user',
+                    'email': 'racing@example.com',
+                    'password': 'pass',
+                    'repeated_password': 'pass',
+                    'type': 'customer',
+                },
+                format='json',
+            )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data,
+            {'detail': 'A user with this username or email already exists.'},
+        )
+        self.assertFalse(User.objects.filter(username='racing-user').exists())
 
     def test_registration_rejects_invalid_role(self):
         response = self.client.post(

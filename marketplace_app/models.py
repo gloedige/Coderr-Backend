@@ -74,3 +74,40 @@ class OfferDetail(models.Model):
 
 	def __str__(self):
 		return f'{self.offer.title} - {self.get_offer_type_display()}'
+
+
+class Order(models.Model):
+	class Status(models.TextChoices):
+		IN_PROGRESS = 'in_progress', 'In progress'
+		COMPLETED = 'completed', 'Completed'
+		CANCELLED = 'cancelled', 'Cancelled'
+
+	customer_user = models.ForeignKey(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.CASCADE,
+		related_name='customer_orders',
+	)
+	business_user = models.ForeignKey(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.CASCADE,
+		related_name='business_orders',
+	)
+	title = models.CharField(max_length=150)
+	revisions = models.PositiveSmallIntegerField()
+	delivery_time_in_days = models.PositiveSmallIntegerField()
+	price = models.DecimalField(max_digits=8, decimal_places=2)
+	features = models.JSONField(default=list, blank=True)
+	offer_type = models.CharField(max_length=8, choices=OfferDetail.OfferType.choices)
+	status = models.CharField(
+		max_length=16,
+		choices=Status.choices,
+		default=Status.IN_PROGRESS,
+	)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		ordering = ('-created_at', '-pk')
+
+	def __str__(self):
+		return f'{self.title} ({self.get_status_display()})'

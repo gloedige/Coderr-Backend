@@ -215,7 +215,7 @@ Liefert Angebote mit Angebotsdetails, Mindestpreis und kürzester Lieferzeit. Ke
 Weitere Statuscodes: `400` ungültige Anfrageparameter, `500` interner Serverfehler.
 
 ### `POST /api/offers/`
-Erstellt ein Angebot. Erfordert Authentifizierung; nur Benutzer vom Typ `business` dürfen Angebote erstellen. Ein Angebot muss genau drei Angebotsdetails enthalten: jeweils eines mit `offer_type` `basic`, `standard` und `premium`. `title` ist erforderlich, nicht leer und maximal 150 Zeichen. `description` ist maximal 500 Zeichen. Der Preis jedes Details muss größer als 0 und höchstens 100000 sein, mit maximal zwei Dezimalstellen. `delivery_time_in_days` liegt zwischen 1 und 365; `revisions` zwischen 0 und 100. `features` ist eine Liste frei formulierter Texte und darf leer sein; es gibt keine vorgegebenen Textbausteine.
+Erstellt ein Angebot. Erfordert Authentifizierung; nur Benutzer vom Typ `business` dürfen Angebote erstellen. Jedes Angebot muss genau drei Angebotsdetails enthalten: jeweils genau eines mit `offer_type` `basic`, `standard` und `premium`. Werden die Details nicht vollständig oder mit doppelten Typen übermittelt, wird das Angebot nicht angelegt. `title` ist erforderlich, nicht leer und maximal 150 Zeichen. `description` ist maximal 500 Zeichen. Der Preis jedes Details muss größer als 0 und höchstens 100000 sein, mit maximal zwei Dezimalstellen. `delivery_time_in_days` liegt zwischen 1 und 365; `revisions` zwischen 0 und 100. `features` ist eine Liste frei formulierter Texte und darf leer sein; es gibt keine vorgegebenen Textbausteine.
 
 Der Request verwendet `multipart/form-data`, wenn ein Bild hochgeladen wird. Die Angebotsdetails werden als JSON-kodierter Textwert im Feld `details` übertragen. `image` akzeptiert JPEG/PNG bis 5 MB. Ohne Bild ist `image` `null`; Responses enthalten bei vorhandenem Bild nur den Dateinamen.
 
@@ -286,7 +286,7 @@ Liefert ein einzelnes Angebot und dessen Detail-URLs. Authentifizierung erforder
 Weitere Statuscodes: `401` nicht authentifiziert, `404` Angebot nicht gefunden, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ### `PATCH /api/offers/{id}/`
-Aktualisiert nur die übermittelten Angebotsfelder. Nur der Ersteller darf das Angebot bearbeiten. Bei Detailänderungen identifiziert `offer_type` (`basic`, `standard`, `premium`) die bestehende Stufe. IDs bleiben erhalten; ausgelassene Felder und Stufen bleiben unverändert. Pflichtfelder dürfen nicht `null` sein. Ein mitgesendetes `features`-Array ersetzt die bisherige Liste. Stufen können nicht entfernt werden. Für Bild-Uploads wird Multipart verwendet: `details` ist ein JSON-kodierter Textwert; ausgelassenes `image` lässt das Bild unverändert, `image: null` löscht es. Zulässige Bildformate und Größen entsprechen dem POST-Endpunkt.
+Aktualisiert nur die übermittelten Angebotsfelder. Nur der Ersteller darf das Angebot bearbeiten. Bei Detailänderungen identifiziert `offer_type` (`basic`, `standard`, `premium`) die bestehende Stufe. IDs bleiben erhalten; ausgelassene Felder und Stufen bleiben unverändert. Pflichtfelder dürfen nicht `null` sein. Ein mitgesendetes `features`-Array ersetzt die bisherige Liste. Stufen können über die API weder hinzugefügt noch gelöscht werden; jedes bestehende Angebot behält somit genau eine Detailstufe pro `offer_type`. Für Bild-Uploads wird Multipart verwendet: `details` ist ein JSON-kodierter Textwert; ausgelassenes `image` lässt das Bild unverändert, `image: null` löscht es. Zulässige Bildformate und Größen entsprechen dem POST-Endpunkt.
 
 **Request Body** (`application/json`, wenn kein Bild hochgeladen oder gelöscht wird; andernfalls `multipart/form-data` mit JSON-kodiertem Feld `details`)
 
@@ -339,7 +339,7 @@ Weitere Statuscodes: `401` nicht authentifiziert, `404` Angebotsdetail nicht gef
 ## Bestellungen
 
 ### `GET /api/orders/`
-Liefert Bestellungen, bei denen der angemeldete Benutzer Kunde oder Geschäftspartner ist, neueste zuerst. Authentifizierung erforderlich. Bestellungen anderer Benutzer werden nicht zurückgegeben.
+Liefert Bestellungen, bei denen der angemeldete Benutzer Kunde oder Geschäftspartner ist, neueste zuerst. Authentifizierung erforderlich. Bestellungen anderer Benutzer werden nicht zurückgegeben. Bestellungen enthalten einen Snapshot der Angebotsdetailwerte zum Kaufzeitpunkt.
 
 **Erfolgreiche Antwort – `200 OK`**: Liste mit Bestellungen im folgenden Format.
 
@@ -365,7 +365,7 @@ Liefert Bestellungen, bei denen der angemeldete Benutzer Kunde oder Geschäftspa
 Weitere Statuscodes: `401` nicht authentifiziert, `500` interner Serverfehler.
 
 ### `POST /api/orders/`
-Erstellt eine Bestellung auf Grundlage eines Angebotsdetails. Nur authentifizierte Benutzer vom Typ `customer` dürfen Bestellungen erstellen. Selbstbestellungen (Kauf eines eigenen Angebots) sind nicht zulässig. Bestellfelder wie Titel, Preis, Features, Typ, Revisionen und Lieferzeit werden als Snapshot gespeichert; spätere Änderungen oder Löschungen des Angebots ändern die Bestellung nicht. Der Status startet als `in_progress`.
+Erstellt eine Bestellung auf Grundlage eines Angebotsdetails. Nur authentifizierte Benutzer vom Typ `customer` dürfen Bestellungen erstellen. Selbstbestellungen (Kauf eines eigenen Angebots) sind nicht zulässig. Bestellfelder wie Titel, Preis, Features, Typ, Revisionen und Lieferzeit werden als Snapshot gespeichert; spätere Änderungen oder Löschungen des Angebots ändern die Bestellung nicht. Der Status startet als `in_progress`. Die Erstellung und Snapshot-Speicherung sind atomar.
 
 **Request Body**
 
@@ -377,7 +377,7 @@ Erstellt eine Bestellung auf Grundlage eines Angebotsdetails. Nur authentifizier
 
 **Erfolgreiche Antwort – `201 Created`**: erstellte Bestellung im Format der Bestellliste. Der Status beginnt beispielhaft mit `in_progress`.
 
-Weitere Statuscodes: `400` fehlende oder ungültige Angebotsdetail-ID, `401` nicht authentifiziert, `403` keine Kundenrolle, `404` Angebotsdetail nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `400` fehlende oder ungültige Angebotsdetail-ID oder Selbstbestellung, `401` nicht authentifiziert, `403` keine Kundenrolle, `404` Angebotsdetail nicht gefunden, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet; interne Fehlerdetails werden nicht offengelegt.
 
 ### `PATCH /api/orders/{id}/`
 Aktualisiert den Status einer Bestellung. Nur der zugeordnete Business-Benutzer darf aktualisieren. Zulässig sind ausschließlich Übergänge von `in_progress` nach `completed` oder `cancelled`; beide Zielstatus sind endgültig. Andere Statusübergänge sowie Änderungen an anderen Feldern sind unzulässig.
@@ -392,17 +392,17 @@ Aktualisiert den Status einer Bestellung. Nur der zugeordnete Business-Benutzer 
 
 **Erfolgreiche Antwort – `200 OK`**: aktualisierte Bestellung im Format der Bestellliste.
 
-Weitere Statuscodes: `400` ungültiger Status oder unzulässige Felder, `401` nicht authentifiziert, `403` keine Berechtigung, `404` Bestellung nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `400` ungültiger Status, unzulässiger Übergang oder unzulässige Felder, `401` nicht authentifiziert, `403` Benutzer ist nicht der zugeordnete Business-Nutzer, `404` Bestellung nicht gefunden, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ### `DELETE /api/orders/{id}/`
 Löscht eine Bestellung. Nur Admin-Benutzer (Staff) dürfen diese Aktion ausführen; Authentifizierung erforderlich.
 
 **Erfolgreiche Antwort – `204 No Content`** (ohne Response-Body).
 
-Weitere Statuscodes: `401` nicht authentifiziert, `403` keine Berechtigung, `404` Bestellung nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `401` nicht authentifiziert, `403` Benutzer ist kein Staff/Admin, `404` Bestellung nicht gefunden, `500` interner Serverfehler. Erfolgreiches Löschen liefert keinen Response-Body. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ### `GET /api/order-count/{business_user_id}/`
-Liefert die Anzahl der Bestellungen des Geschäftsnutzers mit Status `in_progress`. Jeder authentifizierte Benutzer darf den Endpunkt aufrufen.
+Liefert die Anzahl der Bestellungen des Geschäftsnutzers mit Status `in_progress`. Jeder authentifizierte Benutzer darf den Endpunkt aufrufen; die Zählung bezieht sich ausschließlich auf Bestellungen mit dem angegebenen Business-Nutzer.
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -412,10 +412,10 @@ Liefert die Anzahl der Bestellungen des Geschäftsnutzers mit Status `in_progres
 }
 ```
 
-Weitere Statuscodes: `401` nicht authentifiziert, `404` Geschäftsnutzer nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `401` nicht authentifiziert, `404` Geschäftsnutzer nicht gefunden oder kein Business-Profil, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ### `GET /api/completed-order-count/{business_user_id}/`
-Liefert die Anzahl der abgeschlossenen Bestellungen des Geschäftsnutzers. Jeder authentifizierte Benutzer darf den Endpunkt aufrufen.
+Liefert die Anzahl der abgeschlossenen Bestellungen des Geschäftsnutzers. Jeder authentifizierte Benutzer darf den Endpunkt aufrufen; die Zählung bezieht sich ausschließlich auf Bestellungen mit dem angegebenen Business-Nutzer.
 
 **Erfolgreiche Antwort – `200 OK`**
 
@@ -425,7 +425,7 @@ Liefert die Anzahl der abgeschlossenen Bestellungen des Geschäftsnutzers. Jeder
 }
 ```
 
-Weitere Statuscodes: `401` nicht authentifiziert, `404` Geschäftsnutzer nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `401` nicht authentifiziert, `404` Geschäftsnutzer nicht gefunden oder kein Business-Profil, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ## Bewertungen
 

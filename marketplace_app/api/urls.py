@@ -7,12 +7,14 @@ from marketplace_app.api.order_views import (
 	OrderViewSet,
 )
 from marketplace_app.api.offer_views import OfferDetailViewSet, OfferViewSet
+from marketplace_app.api.review_views import ReviewViewSet
 
 app_name = 'marketplace_api'
 
 router = SimpleRouter()
 router.register('offers', OfferViewSet, basename='offer')
 router.register('orders', OrderViewSet, basename='order')
+router.register('reviews', ReviewViewSet, basename='review')
 
 urlpatterns = [
 	path(

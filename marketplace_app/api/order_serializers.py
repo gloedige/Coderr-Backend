@@ -27,7 +27,7 @@ class OrderCreateSerializer(serializers.Serializer):
     offer_detail_id = serializers.IntegerField(min_value=1)
 
     def create(self, validated_data):
-        from django.db import IntegrityError, transaction
+        from django.db import transaction
         from rest_framework.exceptions import NotFound, ValidationError
 
         try:
@@ -41,20 +41,17 @@ class OrderCreateSerializer(serializers.Serializer):
         if detail.offer.user_id == customer.pk:
             raise ValidationError({'offer_detail_id': 'You cannot purchase your own offer.'})
 
-        try:
-            with transaction.atomic():
-                return Order.objects.create(
-                    customer_user=customer,
-                    business_user=detail.offer.user,
-                    title=detail.title,
-                    revisions=detail.revisions,
-                    delivery_time_in_days=detail.delivery_time_in_days,
-                    price=detail.price,
-                    features=list(detail.features),
-                    offer_type=detail.offer_type,
-                )
-        except IntegrityError as exc:
-            raise ValidationError({'detail': 'The order could not be created.'}) from exc
+        with transaction.atomic():
+            return Order.objects.create(
+                customer_user=customer,
+                business_user=detail.offer.user,
+                title=detail.title,
+                revisions=detail.revisions,
+                delivery_time_in_days=detail.delivery_time_in_days,
+                price=detail.price,
+                features=list(detail.features),
+                offer_type=detail.offer_type,
+            )
 
 
 class OrderStatusUpdateSerializer(serializers.Serializer):

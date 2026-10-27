@@ -18,10 +18,6 @@ class User(AbstractUser):
                 condition=Q(type__in=['customer', 'business']),
                 name='accounts_user_type_valid',
             ),
-            models.UniqueConstraint(
-                models.functions.Collate('username', 'NOCASE'),
-                name='accounts_user_username_ci_unique',
-            ),
         ]
 
     def save(self, *args, **kwargs):

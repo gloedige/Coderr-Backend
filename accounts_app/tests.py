@@ -67,19 +67,28 @@ class AccountFoundationTests(TestCase):
         self.assertEqual(user.username, 'neuerNutzer')
         self.assertEqual(user.email, 'mixed.email@example.com')
 
-    def test_case_insensitive_duplicates_are_rejected(self):
+    def test_usernames_are_case_sensitive_but_exact_duplicates_are_rejected(self):
         from django.db import IntegrityError, transaction
 
-        User.objects.create_user(
+        original = User.objects.create_user(
             username='UniqueName',
             email='unique@example.com',
             password='pass',
             type=User.UserType.CUSTOMER,
         )
+        case_variant = User.objects.create_user(
+            username='uniquename',
+            email='case-variant@example.com',
+            password='pass',
+            type=User.UserType.BUSINESS,
+        )
+
+        self.assertEqual(original.username, 'UniqueName')
+        self.assertEqual(case_variant.username, 'uniquename')
 
         with self.assertRaises(IntegrityError), transaction.atomic():
             User.objects.create_user(
-                username='UNIQUENAME',
+                username='UniqueName',
                 email='different@example.com',
                 password='pass',
                 type=User.UserType.BUSINESS,

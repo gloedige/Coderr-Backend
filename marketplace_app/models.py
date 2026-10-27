@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import ClassVar
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -51,7 +52,7 @@ class OfferDetail(models.Model):
 	offer_type = models.CharField(max_length=8, choices=OfferType.choices)
 
 	class Meta:
-		constraints = [
+		constraints: ClassVar[list[models.BaseConstraint]] = [
 			models.UniqueConstraint(
 				fields=['offer', 'offer_type'], name='offer_detail_type_unique'
 			),
@@ -132,7 +133,7 @@ class Review(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 	class Meta:
-		constraints = [
+		constraints: ClassVar[list[models.BaseConstraint]] = [
 			models.UniqueConstraint(
 				fields=['business_user', 'reviewer'],
 				name='review_active_business_reviewer_unique',
@@ -140,4 +141,5 @@ class Review(models.Model):
 		]
 
 	def __str__(self):
+		"""Return a compact label naming the rating, reviewer, and business user."""
 		return f'{self.rating}/5 review by {self.reviewer_id} for {self.business_user_id}'

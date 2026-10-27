@@ -96,7 +96,7 @@ When the shape of that interface is itself in question (how deep the module is, 
 
 # Code-Qualität
 - Halte dich an die bestehenden Code-Standards und Patterns im Projekt.
-- eine Funktion oder Methode hat maximal 14 loc.
+- eine Funktion oder Methode hat maximal 14 lines of code (loc).
 - jede Funktion oder Methode hat einen docstring, der Zweck, Eingaben und Ausgaben beschreibt.
 - Vermeide Code-Duplikate und extrahiere wiederverwendbare Logik in eigene Funktionen oder Module oder eine utils.py Datei.
 - Schreibe Tests für neue Funktionen und Methoden, um deren Korrektheit sicherzustellen.

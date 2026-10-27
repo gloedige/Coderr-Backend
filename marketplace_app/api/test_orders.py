@@ -197,8 +197,12 @@ class OrderEndpointTests(TestCase):
         self.assertEqual(terminal_transition.status_code, 400)
         invalid_status = self.client.patch(order_url, {'status': 'unknown'}, format='json')
         self.assertEqual(invalid_status.status_code, 400)
+        fresh_order = self.create_order(detail=self.standard_detail)
+        self.client.force_authenticate(self.business)
         extra_field = self.client.patch(
-            order_url, {'status': 'completed', 'price': '1.00'}, format='json'
+            f"/api/orders/{fresh_order['id']}/",
+            {'status': 'completed', 'price': '1.00'},
+            format='json',
         )
         self.assertEqual(extra_field.status_code, 400)
 

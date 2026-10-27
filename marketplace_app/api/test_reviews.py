@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.test import TestCase
+
 from rest_framework.test import APIClient
 
 from marketplace_app.models import Offer, OfferDetail, Order, Review
@@ -299,6 +300,20 @@ class ReviewEndpointTests(TestCase):
     def test_review_create_internal_error_returns_safe_500_detail(self):
         """Ensure unexpected review persistence failure never exposes exception details."""
         self.assert_review_create_internal_error()
+
+    def test_review_update_internal_error_returns_safe_500_detail(self):
+        """Ensure unexpected update failure returns the generic internal-error response."""
+        review = self.create_review()
+        self.client.force_authenticate(self.customer)
+        with patch(
+            'marketplace_app.api.review_serializers.ReviewUpdateSerializer.update_review',
+            side_effect=RuntimeError('sensitive review update failure'),
+        ):
+            response = self.client.patch(
+                f"/api/reviews/{review['id']}/", {'rating': 5}, format='json'
+            )
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, {'detail': 'Internal server error.'})
 
     def assert_review_create_internal_error(self):
         """Simulate create failure after validation and assert the generic 500 response."""

@@ -193,6 +193,7 @@ class ReviewEndpointTests(TestCase):
     def test_create_rejects_duplicate_active_review(self):
         """Reject a second active review for the same customer-business pair."""
         self.create_review()
+        self.create_completed_order(customer=self.other_customer)
         duplicate = self.client.post(
             '/api/reviews/',
             {'business_user': self.business.pk, 'rating': 4, 'description': 'Again'},

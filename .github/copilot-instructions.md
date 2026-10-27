@@ -75,6 +75,7 @@ When the shape of that interface is itself in question (how deep the module is, 
 - Dieses Projekt orientiert sich an der Architektur und den Standards aus dem Ordner `_reference/`.
 - Nutze dieselbe Ordnerstruktur, Naming Conventions und Patterns (z. B. permissions, serializers, views, urls, models).
 - Achte darauf, dass neuer Code nach den gleichen Prinzipien aufgebaut wird wie im Referenzprojekt.
+- In Marketplace-Apps werden API-Module fachlich getrennt benannt, statt alle Features in generischen `serializers.py`/`views.py` zu bündeln: beispielsweise `offer_serializers.py` und `offer_views.py`, `order_serializers.py` und `order_views.py`, später `review_serializers.py` und `review_views.py`. Routen werden im gemeinsamen `urls.py` über Router/ViewSets registriert; gemeinsam genutzte Pagination/Permissions erhalten einen klaren, featurebezogenen Modulnamen oder bleiben im dedizierten Modul des Features.
 
 
 # API-Dokumentation
@@ -91,3 +92,11 @@ When the shape of that interface is itself in question (how deep the module is, 
 - Frage nur dann nach, wenn eine echte, nicht auflösbare Blockade besteht oder eine Entscheidung erhebliche, irreversible Folgen hat (z. B. Löschen/Überschreiben von Nutzerdaten, Veröffentlichung, produktive Bereitstellung, Kosten oder Umgang mit Geheimnissen). Beschreibe dann knapp die konkrete Blockade und frage nur das Nötigste.
 - Die Grilling-Anleitung oben wird ausschließlich ausgeführt, wenn der Nutzer ausdrücklich darum bittet, eine Idee/einen Plan zu „grillen“ oder zu stress-testen. Sie gilt nicht für normale Umsetzungsaufträge und hebt den autonomen Arbeitsstandard nicht auf.
 - Vorhandene Branch-/Review-Vereinbarungen beachten: Änderungen in der vereinbarten Gruppe und in kleinen Tickets bündeln; keine Commits, Pushes, Merges oder GitHub-Issue-Erstellung ohne ausdrücklichen Auftrag.
+
+
+# Code-Qualität
+- Halte dich an die bestehenden Code-Standards und Patterns im Projekt.
+- eine Funktion oder Methode hat maximal 14 loc.
+- jede Funktion oder Methode hat einen docstring, der Zweck, Eingaben und Ausgaben beschreibt.
+- Vermeide Code-Duplikate und extrahiere wiederverwendbare Logik in eigene Funktionen oder Module oder eine utils.py Datei.
+- Schreibe Tests für neue Funktionen und Methoden, um deren Korrektheit sicherzustellen.

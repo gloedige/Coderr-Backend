@@ -9,16 +9,16 @@ from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from marketplace_app.api.pagination import OfferPagination
-from marketplace_app.api.permissions import IsBusinessUser, IsOfferOwnerOrReadOnly
-from marketplace_app.api.serializers import (
+from marketplace_app.api.offer_pagination import OfferPagination
+from marketplace_app.api.offer_permissions import IsBusinessUser, IsOfferOwnerOrReadOnly
+from marketplace_app.api.offer_serializers import (
     OfferCreateSerializer,
     OfferCreateResponseSerializer,
     OfferDetailReadSerializer,
     OfferDetailReadOnlySerializer,
     OfferListSerializer,
-    OfferUpdateSerializer,
     OfferUpdateResponseSerializer,
+    OfferUpdateSerializer,
 )
 from marketplace_app.models import Offer, OfferDetail
 

@@ -143,6 +143,14 @@ class OfferEndpointTests(TestCase):
         invalid = self.client.post('/api/offers/', payload, format='json')
         self.assertEqual(invalid.status_code, 400)
 
+        incomplete_payload = self.offer_payload()
+        incomplete_payload['details'] = incomplete_payload['details'][:2]
+        incomplete = self.client.post(
+            '/api/offers/', incomplete_payload, format='json'
+        )
+        self.assertEqual(incomplete.status_code, 400)
+        self.assertFalse(Offer.objects.filter(title='Design Package').exists())
+
         valid = self.client.post('/api/offers/', self.offer_payload(), format='json')
         self.assertEqual(valid.status_code, 201)
         self.assertEqual(
@@ -191,18 +199,17 @@ class OfferEndpointTests(TestCase):
                 )
 
     def test_database_constraint_rejects_negative_revisions_on_bulk_insert(self):
-        offer = Offer.objects.create(user=self.business, title='Constraint check')
-        invalid_detail = OfferDetail(
-            offer=offer,
-            title='Negative revisions',
-            revisions=-1,
-            delivery_time_in_days=5,
-            price=Decimal('10.00'),
-            features=[],
-            offer_type=OfferDetail.OfferType.BASIC,
-        )
-
         with self.assertRaises(IntegrityError), transaction.atomic():
+            offer = Offer.objects.create(user=self.business, title='Constraint check')
+            invalid_detail = OfferDetail(
+                offer=offer,
+                title='Negative revisions',
+                revisions=-1,
+                delivery_time_in_days=5,
+                price=Decimal('10.00'),
+                features=[],
+                offer_type=OfferDetail.OfferType.BASIC,
+            )
             OfferDetail.objects.bulk_create([invalid_detail])
 
     def test_create_accepts_multipart_json_details_and_valid_image(self):
@@ -368,7 +375,7 @@ class OfferEndpointTests(TestCase):
         detail_id = created['details'][0]['id']
 
         with patch(
-            'marketplace_app.api.views.OfferViewSet.get_queryset',
+            'marketplace_app.api.offer_views.OfferViewSet.get_queryset',
             side_effect=RuntimeError('sensitive list failure'),
         ):
             list_response = self.client.get('/api/offers/')
@@ -376,7 +383,7 @@ class OfferEndpointTests(TestCase):
         self.assertEqual(list_response.data, {'detail': 'Internal server error.'})
 
         with patch(
-            'marketplace_app.api.serializers.OfferCreateSerializer.save',
+            'marketplace_app.api.offer_serializers.OfferCreateSerializer.save',
             side_effect=RuntimeError('sensitive create failure'),
         ):
             create_response = self.client.post(
@@ -386,7 +393,7 @@ class OfferEndpointTests(TestCase):
         self.assertEqual(create_response.data, {'detail': 'Internal server error.'})
 
         with patch(
-            'marketplace_app.api.serializers.OfferDetailReadOnlySerializer.data',
+            'marketplace_app.api.offer_serializers.OfferDetailReadOnlySerializer.data',
             new_callable=PropertyMock,
             side_effect=RuntimeError('sensitive retrieve failure'),
         ):
@@ -395,7 +402,7 @@ class OfferEndpointTests(TestCase):
         self.assertEqual(retrieve_response.data, {'detail': 'Internal server error.'})
 
         with patch(
-            'marketplace_app.api.serializers.OfferUpdateSerializer.update_offer',
+            'marketplace_app.api.offer_serializers.OfferUpdateSerializer.update_offer',
             side_effect=RuntimeError('sensitive update failure'),
         ):
             update_response = self.client.patch(
@@ -405,7 +412,7 @@ class OfferEndpointTests(TestCase):
         self.assertEqual(update_response.data, {'detail': 'Internal server error.'})
 
         with patch(
-            'marketplace_app.api.serializers.OfferUpdateResponseSerializer.data',
+            'marketplace_app.api.offer_serializers.OfferUpdateResponseSerializer.data',
             new_callable=PropertyMock,
             side_effect=RuntimeError('sensitive patch response failure'),
         ):
@@ -424,7 +431,7 @@ class OfferEndpointTests(TestCase):
         self.assertEqual(delete_response.data, {'detail': 'Internal server error.'})
 
         with patch(
-            'marketplace_app.api.serializers.OfferDetailReadSerializer.data',
+            'marketplace_app.api.offer_serializers.OfferDetailReadSerializer.data',
             new_callable=PropertyMock,
             side_effect=RuntimeError('sensitive detail failure'),
         ):

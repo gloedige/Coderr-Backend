@@ -58,6 +58,11 @@ class OrderStatusUpdateSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=Order.Status.choices)
 
     def validate(self, attrs):
+        unexpected_fields = set(self.initial_data) - {'status'}
+        if unexpected_fields:
+            raise serializers.ValidationError(
+                {field: 'This field cannot be updated.' for field in sorted(unexpected_fields)}
+            )
         order = self.context['order']
         target_status = attrs['status']
         allowed_transitions = {

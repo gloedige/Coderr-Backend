@@ -67,7 +67,7 @@ class OfferDetail(models.Model):
 				name='offer_detail_delivery_range',
 			),
 			models.CheckConstraint(
-				condition=models.Q(revisions__lte=100),
+				condition=models.Q(revisions__gte=0, revisions__lte=100),
 				name='offer_detail_revisions_max',
 			),
 		]

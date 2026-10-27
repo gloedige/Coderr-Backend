@@ -6,11 +6,12 @@ from tempfile import TemporaryDirectory
 from unittest.mock import PropertyMock, patch
 
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError, transaction
 from django.test import TestCase, override_settings
 from PIL import Image
 from rest_framework.test import APIClient
 
-from marketplace_app.models import Offer
+from marketplace_app.models import Offer, OfferDetail
 
 
 User = get_user_model()
@@ -188,6 +189,21 @@ class OfferEndpointTests(TestCase):
                     self.client.post('/api/offers/', payload, format='json').status_code,
                     400,
                 )
+
+    def test_database_constraint_rejects_negative_revisions_on_bulk_insert(self):
+        offer = Offer.objects.create(user=self.business, title='Constraint check')
+        invalid_detail = OfferDetail(
+            offer=offer,
+            title='Negative revisions',
+            revisions=-1,
+            delivery_time_in_days=5,
+            price=Decimal('10.00'),
+            features=[],
+            offer_type=OfferDetail.OfferType.BASIC,
+        )
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            OfferDetail.objects.bulk_create([invalid_detail])
 
     def test_create_accepts_multipart_json_details_and_valid_image(self):
         self.client.force_authenticate(self.business)

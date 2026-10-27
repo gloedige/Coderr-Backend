@@ -208,7 +208,9 @@ class OfferViewSet(viewsets.ModelViewSet):
         try:
             offer.delete()
             if old_image_name:
-                transaction.on_commit(lambda: old_image.storage.delete(old_image_name))
+                transaction.on_commit(
+                    lambda: old_image.storage.delete(old_image_name), robust=True
+                )
         except APIException:
             raise
         except Exception:

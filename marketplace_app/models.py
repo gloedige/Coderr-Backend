@@ -134,6 +134,10 @@ class Review(models.Model):
 
 	class Meta:
 		constraints: ClassVar[list[models.BaseConstraint]] = [
+			models.CheckConstraint(
+				condition=models.Q(rating__gte=1, rating__lte=5),
+				name='review_rating_range',
+			),
 			models.UniqueConstraint(
 				fields=['business_user', 'reviewer'],
 				name='review_active_business_reviewer_unique',

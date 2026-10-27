@@ -2,10 +2,11 @@ from decimal import Decimal
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from marketplace_app.models import Offer, OfferDetail, Order
+from marketplace_app.models import Offer, OfferDetail, Order, Review
 
 
 User = get_user_model()
@@ -200,6 +201,24 @@ class ReviewEndpointTests(TestCase):
             format='json',
         )
         self.assertEqual(duplicate.status_code, 400)
+
+    def test_database_constraint_rejects_out_of_range_ratings(self):
+        """Ensure direct bulk inserts cannot persist ratings outside the 1–5 range."""
+        for rating in (0, 6):
+            with self.subTest(rating=rating):
+                self.assert_database_rejects_rating(rating)
+
+    def assert_database_rejects_rating(self, rating):
+        """Attempt a direct bulk insert and assert the database check rejects its rating."""
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Review.objects.bulk_create([
+                Review(
+                    business_user=self.business,
+                    reviewer=self.customer,
+                    rating=rating,
+                    description='Direct database test',
+                )
+            ])
 
     def test_create_rejects_rating_and_description_out_of_range(self):
         """Reject ratings outside one to five and descriptions outside 1-500 characters."""

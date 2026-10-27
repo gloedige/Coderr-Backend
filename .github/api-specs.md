@@ -255,9 +255,9 @@ Der Request verwendet `multipart/form-data`, wenn ein Bild hochgeladen wird. Die
 }
 ```
 
-**Erfolgreiche Antwort – `201 Created`**: erstelltes Angebot mit `id` sowie den Angebotsdetails einschließlich ihrer IDs.
+**Erfolgreiche Antwort – `201 Created`**: erstelltes Angebot mit `id`, `title`, `image`, `description` und den Angebotsdetails einschließlich ihrer IDs und Detailfelder.
 
-Weitere Statuscodes: `400` ungültige oder unvollständige Anfragedaten, `401` nicht authentifiziert, `403` kein Business-Profil, `500` interner Serverfehler.
+Weitere Statuscodes: `400` ungültige oder unvollständige Anfragedaten, `401` nicht authentifiziert, `403` kein Business-Profil, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet; interne Fehlerdetails werden nicht offengelegt.
 
 ### `GET /api/offers/{id}/`
 Liefert ein einzelnes Angebot und dessen Detail-URLs. Authentifizierung erforderlich. Bildantworten enthalten den Dateinamen, nicht die URL. Die drei Detail-URLs referenzieren `GET /api/offerdetails/{id}/`.
@@ -283,7 +283,7 @@ Liefert ein einzelnes Angebot und dessen Detail-URLs. Authentifizierung erforder
 }
 ```
 
-Weitere Statuscodes: `401` nicht authentifiziert, `404` Angebot nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `401` nicht authentifiziert, `404` Angebot nicht gefunden, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ### `PATCH /api/offers/{id}/`
 Aktualisiert nur die übermittelten Angebotsfelder. Nur der Ersteller darf das Angebot bearbeiten. Bei Detailänderungen identifiziert `offer_type` (`basic`, `standard`, `premium`) die bestehende Stufe. IDs bleiben erhalten; ausgelassene Felder und Stufen bleiben unverändert. Pflichtfelder dürfen nicht `null` sein. Ein mitgesendetes `features`-Array ersetzt die bisherige Liste. Stufen können nicht entfernt werden. Für Bild-Uploads wird Multipart verwendet: `details` ist ein JSON-kodierter Textwert; ausgelassenes `image` lässt das Bild unverändert, `image: null` löscht es. Zulässige Bildformate und Größen entsprechen dem POST-Endpunkt.
@@ -306,16 +306,16 @@ Aktualisiert nur die übermittelten Angebotsfelder. Nur der Ersteller darf das A
 }
 ```
 
-**Erfolgreiche Antwort – `200 OK`**: das vollständige aktualisierte Angebot einschließlich aller Angebotsdetails.
+**Erfolgreiche Antwort – `200 OK`**: `id`, `title`, `image`, `description` und alle Angebotsdetails einschließlich ihrer IDs und Detailfelder.
 
-Weitere Statuscodes: `400` ungültige oder unvollständige Anfragedaten, `401` nicht authentifiziert, `403` nicht Ersteller, `404` Angebot nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `400` ungültige oder unvollständige Anfragedaten, `401` nicht authentifiziert, `403` nicht Ersteller, `404` Angebot nicht gefunden, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ### `DELETE /api/offers/{id}/`
 Löscht ein Angebot. Nur der Ersteller darf es löschen; Authentifizierung erforderlich. Bereits angelegte Bestellungen enthalten einen Snapshot der gekauften Angebotsdetails und bleiben durch eine Angebotslöschung unverändert.
 
 **Erfolgreiche Antwort – `204 No Content`** (ohne Response-Body).
 
-Weitere Statuscodes: `401` nicht authentifiziert, `403` nicht Ersteller, `404` Angebot nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `401` nicht authentifiziert, `403` nicht Ersteller, `404` Angebot nicht gefunden, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ### `GET /api/offerdetails/{id}/`
 Liefert ein einzelnes Angebotsdetail. Authentifizierung erforderlich.
@@ -334,7 +334,7 @@ Liefert ein einzelnes Angebotsdetail. Authentifizierung erforderlich.
 }
 ```
 
-Weitere Statuscodes: `401` nicht authentifiziert, `404` Angebotsdetail nicht gefunden, `500` interner Serverfehler.
+Weitere Statuscodes: `401` nicht authentifiziert, `404` Angebotsdetail nicht gefunden, `500` interner Serverfehler. Ein unerwarteter Serverfehler wird mit `{"detail":"Internal server error."}` beantwortet.
 
 ## Bestellungen
 

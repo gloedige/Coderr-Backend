@@ -39,6 +39,7 @@ def internal_error(message):
 class ReviewViewSet(viewsets.ViewSet):
     """Expose authenticated review list/create/update/delete API operations."""
 
+    lookup_value_regex = r'\d+'
     permission_classes = (IsAuthenticated,)
 
     def list(self, request):

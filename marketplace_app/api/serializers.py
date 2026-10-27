@@ -186,9 +186,9 @@ class OfferDetailReadOnlySerializer(serializers.ModelSerializer):
         )
 
 
-class OfferCreateResponseSerializer(OfferDetailReadOnlySerializer):
-    details = OfferDetailReadSerializer(many=True, read_only=True)
+class OfferCreateResponseSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    details = OfferDetailReadSerializer(many=True, read_only=True)
 
     class Meta:
         model = Offer

@@ -96,7 +96,7 @@ Liefert das vollständige Profil des Benutzers `{pk}`. Authentifizierung erforde
 Die Felder `first_name`, `last_name`, `location`, `tel`, `description` und `working_hours` sollen nicht `null` sein; bei fehlenden Werten werden leere Strings verwendet. Weitere Statuscodes: `401` nicht authentifiziert, `404` Profil nicht gefunden, `500` interner Serverfehler.
 
 ### `PATCH /api/profile/{pk}/`
-Aktualisiert ausgewählte Profildaten des eigenen Kontos; fremde Profile dürfen nicht bearbeitet werden. `username` und `type` sind nicht änderbar. Gemeinsame editierbare Felder sind `first_name`, `last_name`, `location`, `tel` und `email`. `description` und `working_hours` sind nur für Business-Profile editierbar. Nicht übermittelte Felder bleiben unverändert. E-Mail-Eindeutigkeit ist case-insensitiv.
+Aktualisiert ausgewählte Profildaten des eigenen Kontos; fremde Profile dürfen nicht bearbeitet werden. `username` und `type` sind nicht änderbar. Gemeinsame editierbare Felder sind `first_name`, `last_name`, `location`, `tel` und `email`. `description` und `working_hours` sind unabhängig vom type Business oder Customer editierbar. Nicht übermittelte Felder bleiben unverändert. E-Mail-Eindeutigkeit ist case-insensitiv.
 
 Für Bilddateien wird `multipart/form-data` verwendet. `file` enthält JPEG/PNG bis 5 MB. Bei ausgelassenem Feld bleibt das aktuelle Bild bestehen; der Multipart-Textwert `null` entfernt es. JSON-Feldwerte werden bei Multipart als Textfelder übertragen. Ungültige Dateiformate oder zu große Dateien ergeben `400`.
 

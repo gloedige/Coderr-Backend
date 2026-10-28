@@ -1,5 +1,3 @@
-import logging
-
 from django.db import transaction
 from rest_framework import status
 from rest_framework.exceptions import APIException
@@ -8,13 +6,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts_app.api.serializers import LoginSerializer, RegistrationSerializer
+from core.api.utils import internal_error_response
 
 
-logger = logging.getLogger(__name__)
 PUBLIC_PERMISSIONS = (AllowAny,)
 
 
 def authentication_response(user, token):
+    """Return the token response body for `user` and `token`."""
     return {
         'token': token.key,
         'username': user.username,
@@ -24,9 +23,12 @@ def authentication_response(user, token):
 
 
 class RegistrationView(APIView):
+    """Register a new customer or business account."""
+
     permission_classes = PUBLIC_PERMISSIONS
 
     def post(self, request):
+        """Create the account and return 201 with token data or a sanitized 500."""
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
@@ -35,25 +37,18 @@ class RegistrationView(APIView):
         except APIException:
             raise
         except Exception:
-            logger.exception('Registration failed due to an internal error.')
-            return Response(
-                {'detail': 'Internal server error.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-        return Response(
-            authentication_response(user, token),
-            status=status.HTTP_201_CREATED,
-        )
+            return internal_error_response('Registration failed due to an internal error.')
+        return Response(authentication_response(user, token), status=status.HTTP_201_CREATED)
 
 
 class LoginView(APIView):
+    """Authenticate a user and return a token."""
+
     permission_classes = PUBLIC_PERMISSIONS
 
     def post(self, request):
-        serializer = LoginSerializer(
-            data=request.data,
-            context={'request': request},
-        )
+        """Validate credentials and return the token response."""
+        serializer = LoginSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
         return Response(authentication_response(user, token))

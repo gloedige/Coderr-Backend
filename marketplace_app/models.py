@@ -7,6 +7,8 @@ from django.db import models
 
 
 class Offer(models.Model):
+	"""A business user's service offer with up to three priced detail tiers."""
+
 	user = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE,
@@ -19,11 +21,16 @@ class Offer(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
+		"""Return the offer title."""
 		return self.title
 
 
 class OfferDetail(models.Model):
+	"""One basic, standard, or premium tier of an offer."""
+
 	class OfferType(models.TextChoices):
+		"""Allowed offer tiers."""
+
 		BASIC = 'basic', 'Basic'
 		STANDARD = 'standard', 'Standard'
 		PREMIUM = 'premium', 'Premium'
@@ -52,6 +59,8 @@ class OfferDetail(models.Model):
 	offer_type = models.CharField(max_length=8, choices=OfferType.choices)
 
 	class Meta:
+		"""Enforce one detail per tier and valid price, delivery, and revision ranges."""
+
 		constraints: ClassVar[list[models.BaseConstraint]] = [
 			models.UniqueConstraint(
 				fields=['offer', 'offer_type'], name='offer_detail_type_unique'
@@ -74,11 +83,16 @@ class OfferDetail(models.Model):
 		]
 
 	def __str__(self):
+		"""Return the offer title with the tier name."""
 		return f'{self.offer.title} - {self.get_offer_type_display()}'
 
 
 class Order(models.Model):
+	"""A customer's purchase with a snapshot of the purchased offer detail."""
+
 	class Status(models.TextChoices):
+		"""Allowed order states."""
+
 		IN_PROGRESS = 'in_progress', 'In progress'
 		COMPLETED = 'completed', 'Completed'
 		CANCELLED = 'cancelled', 'Cancelled'
@@ -108,13 +122,18 @@ class Order(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 	class Meta:
+		"""Order newest orders first."""
+
 		ordering = ('-created_at', '-pk')
 
 	def __str__(self):
+		"""Return the order title with its status label."""
 		return f'{self.title} ({self.get_status_display()})'
 
 
 class Review(models.Model):
+	"""A customer's rating and comment for a business user."""
+
 	business_user = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE,
@@ -133,6 +152,8 @@ class Review(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 	class Meta:
+		"""Limit ratings to 1-5 and allow one review per reviewer and business."""
+
 		constraints: ClassVar[list[models.BaseConstraint]] = [
 			models.CheckConstraint(
 				condition=models.Q(rating__gte=1, rating__lte=5),

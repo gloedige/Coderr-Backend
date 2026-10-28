@@ -1,4 +1,3 @@
-import logging
 from decimal import Decimal, ROUND_HALF_UP
 
 from django.db.models import Avg
@@ -7,10 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts_app.models import Profile, User
+from core.api.utils import internal_error_response
 from marketplace_app.models import Offer, Review
-
-
-logger = logging.getLogger(__name__)
 
 
 def base_info_data():
@@ -40,8 +37,5 @@ class BaseInfoView(APIView):
         try:
             data = base_info_data()
         except Exception:
-            logger.exception('Base information request failed internally.')
-            return Response(
-                {'detail': 'Internal server error.'}, status=500
-            )
+            return internal_error_response('Base information request failed internally.')
         return Response(data)

@@ -1,22 +1,34 @@
-import json
 from decimal import Decimal
 
-from PIL import Image, UnidentifiedImageError
+from django.db import IntegrityError, transaction
 from rest_framework import serializers
+from rest_framework.exceptions import NotFound, ValidationError
 
+from core.api.utils import (
+    decode_json_field,
+    file_basename,
+    null_text_to_none,
+    schedule_replaced_file_deletion,
+    validate_image_upload,
+)
 from marketplace_app.models import Offer, OfferDetail
 
 
-MAX_IMAGE_SIZE = 5 * 1024 * 1024
-ALLOWED_IMAGE_FORMATS = {'JPEG', 'PNG'}
 OFFER_TYPES = {choice[0] for choice in OfferDetail.OfferType.choices}
+REQUIRED_DETAIL_FIELDS = {'title', 'revisions', 'delivery_time_in_days', 'price'}
+CONSTRAINT_ERROR = {'detail': 'The offer data violates a uniqueness or data constraint.'}
 
 
-def image_basename(image):
-    return image.name.rsplit('/', 1)[-1] if image else None
+def validated_detail_items(details, partial):
+    """Validate raw detail dicts and return the validated list."""
+    serializer = OfferDetailWriteSerializer(data=details, many=True, partial=partial)
+    serializer.is_valid(raise_exception=True)
+    return serializer.validated_data
 
 
 class OfferDetailWriteSerializer(serializers.Serializer):
+    """Validate one offer detail submitted for creation or update."""
+
     offer_type = serializers.ChoiceField(choices=OfferDetail.OfferType.choices)
     title = serializers.CharField(max_length=150, required=False, allow_blank=False)
     revisions = serializers.IntegerField(min_value=0, max_value=100, required=False)
@@ -30,118 +42,128 @@ class OfferDetailWriteSerializer(serializers.Serializer):
     )
 
 
-class OfferCreateSerializer(serializers.Serializer):
+class OfferMultipartSerializer(serializers.Serializer):
+    """Base for offer write serializers accepting JSON or multipart input."""
+
+    details_error_message = 'Expected a JSON-encoded array.'
+
+    def to_internal_value(self, data):
+        """Normalize multipart input: text 'null' image clears it, details is JSON text."""
+        data = null_text_to_none(data, 'image')
+        data = decode_json_field(data, 'details', self.details_error_message)
+        return super().to_internal_value(data)
+
+    def validate_image(self, value):
+        """Accept only JPEG/PNG images up to 5 MB, or None."""
+        return validate_image_upload(value)
+
+
+class OfferCreateSerializer(OfferMultipartSerializer):
+    """Validate and create an offer with exactly three detail tiers."""
+
+    details_error_message = 'Expected a JSON-encoded array of three detail objects.'
     title = serializers.CharField(max_length=150, allow_blank=False)
     image = serializers.FileField(required=False, allow_null=True)
     description = serializers.CharField(max_length=500, required=False, allow_blank=True)
     details = serializers.ListField(child=serializers.DictField(), min_length=3, max_length=3)
 
-    def to_internal_value(self, data):
-        if hasattr(data, 'getlist'):
-            data = data.dict()
-        if hasattr(data, 'get') and data.get('image') == 'null':
-            data = dict(data)
-            data['image'] = None
-        if hasattr(data, 'get') and isinstance(data.get('details'), str):
-            copied_data = dict(data)
-            try:
-                copied_data['details'] = json.loads(copied_data['details'])
-            except (TypeError, ValueError) as exc:
-                raise serializers.ValidationError(
-                    {'details': 'Expected a JSON-encoded array of three detail objects.'}
-                ) from exc
-            data = copied_data
-        return super().to_internal_value(data)
-
-    def validate_image(self, value):
-        return validate_offer_image(value)
-
     def validate_details(self, details):
-        detail_serializer = OfferDetailWriteSerializer(data=details, many=True)
-        detail_serializer.is_valid(raise_exception=True)
-        offer_types = [item['offer_type'] for item in detail_serializer.validated_data]
+        """Require one complete detail for each of basic, standard, and premium."""
+        items = validated_detail_items(details, partial=False)
+        offer_types = [item['offer_type'] for item in items]
         if len(set(offer_types)) != 3 or set(offer_types) != OFFER_TYPES:
             raise serializers.ValidationError(
                 'Exactly one detail for each of basic, standard, and premium is required.'
             )
-        for item in detail_serializer.validated_data:
-            missing = {'title', 'revisions', 'delivery_time_in_days', 'price'} - item.keys()
-            if missing:
-                raise serializers.ValidationError(
-                    f"Detail '{item['offer_type']}' is missing required fields: {', '.join(sorted(missing))}."
-                )
-            item.setdefault('features', [])
-        return detail_serializer.validated_data
+        for item in items:
+            self.complete_detail(item)
+        return items
+
+    def complete_detail(self, item):
+        """Reject a detail with missing required fields and default its features."""
+        missing = REQUIRED_DETAIL_FIELDS - item.keys()
+        if missing:
+            raise serializers.ValidationError(
+                f"Detail '{item['offer_type']}' is missing required fields: "
+                f"{', '.join(sorted(missing))}."
+            )
+        item.setdefault('features', [])
 
     def create(self, validated_data):
-        from django.db import IntegrityError, transaction
-        from rest_framework.exceptions import ValidationError
-
+        """Create the offer and its details atomically and return the offer."""
         details = validated_data.pop('details')
         image = validated_data.pop('image', None)
         try:
             with transaction.atomic():
                 offer = Offer.objects.create(
-                    user=self.context['request'].user,
-                    image=image,
-                    **validated_data,
+                    user=self.context['request'].user, image=image, **validated_data
                 )
                 OfferDetail.objects.bulk_create(
                     [OfferDetail(offer=offer, **detail) for detail in details]
                 )
         except IntegrityError as exc:
-            raise ValidationError({'detail': 'The offer data violates a uniqueness or data constraint.'}) from exc
+            raise ValidationError(CONSTRAINT_ERROR) from exc
         return offer
 
 
 class OfferDetailReadSerializer(serializers.ModelSerializer):
+    """Serialize a single offer detail."""
+
     class Meta:
+        """Expose the offer detail fields."""
+
         model = OfferDetail
         fields = (
-            'id',
-            'title',
-            'revisions',
-            'delivery_time_in_days',
-            'price',
-            'features',
-            'offer_type',
+            'id', 'title', 'revisions', 'delivery_time_in_days',
+            'price', 'features', 'offer_type',
         )
 
 
-class OfferListSerializer(serializers.ModelSerializer):
-    user = serializers.IntegerField(source='user_id', read_only=True)
+class OfferSummaryMixin(serializers.Serializer):
+    """Shared image, minimum price, and minimum delivery time fields."""
+
     image = serializers.SerializerMethodField()
-    details = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
     min_delivery_time = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        """Return the offer image base name or None."""
+        return file_basename(obj.image)
+
+    def get_min_price(self, obj):
+        """Return the lowest detail price or None."""
+        return min((detail.price for detail in obj.details.all()), default=None)
+
+    def get_min_delivery_time(self, obj):
+        """Return the shortest detail delivery time or None."""
+        return min((detail.delivery_time_in_days for detail in obj.details.all()), default=None)
+
+
+class OfferListSerializer(OfferSummaryMixin, serializers.ModelSerializer):
+    """Serialize offers for the paginated list."""
+
+    user = serializers.IntegerField(source='user_id', read_only=True)
+    details = serializers.SerializerMethodField()
     user_details = serializers.SerializerMethodField()
 
     class Meta:
+        """Expose the offer list field set."""
+
         model = Offer
         fields = (
             'id', 'user', 'title', 'image', 'description', 'created_at',
             'updated_at', 'details', 'min_price', 'min_delivery_time', 'user_details',
         )
 
-    def get_image(self, obj):
-        return image_basename(obj.image)
-
     def get_details(self, obj):
+        """Return id and relative URL for every detail."""
         return [
             {'id': detail.pk, 'url': f'/api/offerdetails/{detail.pk}/'}
             for detail in obj.details.all()
         ]
 
-    def get_min_price(self, obj):
-        return min((detail.price for detail in obj.details.all()), default=None)
-
-    def get_min_delivery_time(self, obj):
-        return min(
-            (detail.delivery_time_in_days for detail in obj.details.all()),
-            default=None,
-        )
-
     def get_user_details(self, obj):
+        """Return the creator's first name, last name, and username."""
         profile = getattr(obj.user, 'profile', None)
         return {
             'first_name': profile.first_name if profile else '',
@@ -151,142 +173,110 @@ class OfferListSerializer(serializers.ModelSerializer):
 
 
 class OfferDetailLinkSerializer(serializers.Serializer):
+    """Serialize a detail id with its absolute URL."""
+
     id = serializers.IntegerField()
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
+        """Return the absolute detail URL when a request is available, else the path."""
         request = self.context.get('request')
         path = f'/api/offerdetails/{obj.pk}/'
         return request.build_absolute_uri(path) if request else path
 
 
-class OfferDetailReadOnlySerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+class OfferDetailReadOnlySerializer(OfferSummaryMixin, serializers.ModelSerializer):
+    """Serialize a single offer with detail links."""
+
     details = OfferDetailLinkSerializer(many=True, read_only=True)
-    min_price = serializers.SerializerMethodField()
-    min_delivery_time = serializers.SerializerMethodField()
 
     class Meta:
+        """Expose the single-offer field set."""
+
         model = Offer
         fields = (
             'id', 'user', 'title', 'image', 'description', 'created_at',
             'updated_at', 'details', 'min_price', 'min_delivery_time',
         )
 
-    def get_image(self, obj):
-        return image_basename(obj.image)
-
-    def get_min_price(self, obj):
-        return min((detail.price for detail in obj.details.all()), default=None)
-
-    def get_min_delivery_time(self, obj):
-        return min(
-            (detail.delivery_time_in_days for detail in obj.details.all()),
-            default=None,
-        )
-
 
 class OfferCreateResponseSerializer(serializers.ModelSerializer):
+    """Serialize a created or updated offer with full detail data."""
+
     image = serializers.SerializerMethodField()
     details = OfferDetailReadSerializer(many=True, read_only=True)
 
     class Meta:
+        """Expose the create/update response field set."""
+
         model = Offer
         fields = ('id', 'title', 'image', 'description', 'details')
 
     def get_image(self, obj):
-        return image_basename(obj.image)
+        """Return the offer image base name or None."""
+        return file_basename(obj.image)
 
 
 class OfferUpdateResponseSerializer(OfferCreateResponseSerializer):
-    pass
+    """Serialize an updated offer using the create response format."""
 
 
-class OfferUpdateSerializer(serializers.Serializer):
+class OfferUpdateSerializer(OfferMultipartSerializer):
+    """Validate partial offer updates and apply them atomically."""
+
     title = serializers.CharField(max_length=150, required=False, allow_blank=False)
     image = serializers.FileField(required=False, allow_null=True)
     description = serializers.CharField(max_length=500, required=False, allow_blank=True)
     details = serializers.ListField(child=serializers.DictField(), required=False)
 
-    def to_internal_value(self, data):
-        if hasattr(data, 'getlist'):
-            data = data.dict()
-        if hasattr(data, 'get') and data.get('image') == 'null':
-            data = dict(data)
-            data['image'] = None
-        if hasattr(data, 'get') and isinstance(data.get('details'), str):
-            copied_data = dict(data)
-            try:
-                copied_data['details'] = json.loads(copied_data['details'])
-            except (TypeError, ValueError) as exc:
-                raise serializers.ValidationError({'details': 'Expected a JSON-encoded array.'}) from exc
-            data = copied_data
-        return super().to_internal_value(data)
-
-    def validate_image(self, value):
-        return validate_offer_image(value)
-
     def validate_details(self, details):
-        detail_serializer = OfferDetailWriteSerializer(data=details, many=True, partial=True)
-        detail_serializer.is_valid(raise_exception=True)
-        offer_types = [item['offer_type'] for item in detail_serializer.validated_data]
+        """Validate partial detail updates with at most one entry per offer type."""
+        items = validated_detail_items(details, partial=True)
+        offer_types = [item['offer_type'] for item in items]
         if len(offer_types) != len(set(offer_types)):
             raise serializers.ValidationError('Each offer_type may be updated only once.')
-        return detail_serializer.validated_data
+        return items
 
     def update_offer(self):
-        from django.db import IntegrityError, transaction
-        from rest_framework.exceptions import NotFound, ValidationError
-
+        """Apply the validated changes atomically and return the updated offer."""
         offer = self.context['offer']
         data = dict(self.validated_data)
         details = data.pop('details', serializers.empty)
         image = data.pop('image', serializers.empty)
         old_image = offer.image
-        old_image_name = old_image.name if old_image else None
         try:
             with transaction.atomic():
-                for field, value in data.items():
-                    setattr(offer, field, value)
-                if image is not serializers.empty:
-                    offer.image = image
-                if data or image is not serializers.empty:
-                    offer.save()
+                self.apply_offer_fields(offer, data, image)
                 if details is not serializers.empty:
-                    for validated_detail_data in details:
-                        detail_data = dict(validated_detail_data)
-                        offer_type = detail_data.pop('offer_type')
-                        try:
-                            detail = offer.details.get(offer_type=offer_type)
-                        except OfferDetail.DoesNotExist as exc:
-                            raise NotFound(f"Offer detail '{offer_type}' was not found.") from exc
-                        for field, value in detail_data.items():
-                            setattr(detail, field, value.copy() if isinstance(value, list) else value)
-                        if detail_data:
-                            detail.save()
-                    offer._prefetched_objects_cache.pop('details', None)
-                if (
-                    image is not serializers.empty
-                    and old_image_name
-                    and old_image_name != (offer.image.name if offer.image else None)
-                ):
-                    transaction.on_commit(lambda: old_image.storage.delete(old_image_name))
+                    self.apply_details(offer, details)
+                schedule_replaced_file_deletion(old_image, offer.image)
         except IntegrityError as exc:
-            raise ValidationError({'detail': 'The offer data violates a uniqueness or data constraint.'}) from exc
+            raise ValidationError(CONSTRAINT_ERROR) from exc
         return offer
 
+    def apply_offer_fields(self, offer, data, image):
+        """Set and save the top-level offer fields and image when provided."""
+        for field, value in data.items():
+            setattr(offer, field, value)
+        if image is not serializers.empty:
+            offer.image = image
+        if data or image is not serializers.empty:
+            offer.save()
 
-def validate_offer_image(value):
-    if value is None:
-        return value
-    if value.size > MAX_IMAGE_SIZE:
-        raise serializers.ValidationError('Image must not exceed 5 MB.')
-    try:
-        image = Image.open(value)
-        image.verify()
-    except (UnidentifiedImageError, OSError, ValueError) as exc:
-        raise serializers.ValidationError('Only valid JPEG and PNG images are accepted.') from exc
-    if image.format not in ALLOWED_IMAGE_FORMATS:
-        raise serializers.ValidationError('Only JPEG and PNG images are accepted.')
-    value.seek(0)
-    return value
+    def apply_details(self, offer, details):
+        """Update the existing details identified by offer_type and reset the prefetch cache."""
+        for item in details:
+            self.apply_detail(offer, dict(item))
+        getattr(offer, '_prefetched_objects_cache', {}).pop('details', None)
+
+    def apply_detail(self, offer, detail_data):
+        """Update the offer's detail of the given offer_type or raise 404."""
+        offer_type = detail_data.pop('offer_type')
+        try:
+            detail = offer.details.get(offer_type=offer_type)
+        except OfferDetail.DoesNotExist as exc:
+            raise NotFound(f"Offer detail '{offer_type}' was not found.") from exc
+        for field, value in detail_data.items():
+            setattr(detail, field, list(value) if isinstance(value, list) else value)
+        if detail_data:
+            detail.save()

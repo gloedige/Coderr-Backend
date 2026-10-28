@@ -14,6 +14,8 @@ User = get_user_model()
 
 
 class ReviewEndpointTests(TestCase):
+    """Endpoint tests for the review API."""
+
     def setUp(self):
         """Prepare review API client and customer/business fixtures for each test."""
         self.client = APIClient()

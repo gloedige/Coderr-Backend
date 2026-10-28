@@ -20,15 +20,15 @@ from marketplace_app.api.review_serializers import ReviewReadSerializer
 class UTCDateTimeFieldTests(SimpleTestCase):
     """Verify the timestamp format shared by API model serializers."""
 
-    def test_representation_uses_utc_and_two_fractional_digits(self):
-        """Render timezone-aware values in UTC and truncate after hundredths."""
+    def test_representation_uses_utc_and_omits_fractional_seconds(self):
+        """Render timezone-aware values in UTC without fractional seconds."""
         value = datetime(
             2026, 10, 28, 12, 51, 58, 269876, tzinfo=timezone(timedelta(hours=2))
         )
 
         self.assertEqual(
             UTCDateTimeField().to_representation(value),
-            '2026-10-28T10:51:58.26Z',
+            '2026-10-28T10:51:58Z',
         )
 
     def test_all_datetime_response_fields_use_the_shared_field(self):

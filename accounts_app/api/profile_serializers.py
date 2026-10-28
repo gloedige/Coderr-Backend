@@ -71,16 +71,6 @@ class ProfileUpdateSerializer(serializers.Serializer):
         """Accept only JPEG/PNG images up to 5 MB, or None to clear."""
         return validate_image_upload(value)
 
-    def validate(self, attrs):
-        """Reject business-only fields submitted for non-business profiles."""
-        profile = self.context['profile']
-        forbidden = {'description', 'working_hours'} & attrs.keys()
-        if profile.user.type != User.UserType.BUSINESS and forbidden:
-            raise serializers.ValidationError(
-                {field: 'This field is only editable for business profiles.' for field in forbidden}
-            )
-        return attrs
-
     def update_profile(self):
         """Apply validated changes atomically and return the updated profile."""
         profile, user = self.context['profile'], self.context['user']

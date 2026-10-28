@@ -205,19 +205,21 @@ class ProfileEndpointTests(TestCase):
         self.customer.refresh_from_db()
         self.assertEqual(self.customer.email, 'customer@example.com')
 
-    def test_customer_cannot_update_business_only_fields(self):
-        """Customers cannot set description or working hours."""
+    def test_customer_can_update_description_and_working_hours(self):
+        """Customers can update description and working hours on their profile."""
         self.client.force_authenticate(self.customer)
 
         response = self.patch_profile(
             self.customer.pk,
-            {'description': 'not permitted', 'working_hours': '10-18'},
+            {'description': 'Available for consulting', 'working_hours': '10-18'},
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['description'], 'Available for consulting')
+        self.assertEqual(response.data['working_hours'], '10-18')
         self.customer_profile.refresh_from_db()
-        self.assertEqual(self.customer_profile.description, '')
-        self.assertEqual(self.customer_profile.working_hours, '')
+        self.assertEqual(self.customer_profile.description, 'Available for consulting')
+        self.assertEqual(self.customer_profile.working_hours, '10-18')
 
     def test_business_and_customer_lists_return_their_documented_projections(self):
         """Business and customer lists return their documented projections."""

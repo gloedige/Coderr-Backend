@@ -11,6 +11,7 @@ from core.api.utils import (
     schedule_replaced_file_deletion,
     validate_image_upload,
 )
+from core.api.serializers import APIModelSerializer
 from marketplace_app.models import Offer, OfferDetail
 
 
@@ -106,7 +107,7 @@ class OfferCreateSerializer(OfferMultipartSerializer):
         return offer
 
 
-class OfferDetailReadSerializer(serializers.ModelSerializer):
+class OfferDetailReadSerializer(APIModelSerializer):
     """Serialize a single offer detail."""
 
     class Meta:
@@ -139,7 +140,7 @@ class OfferSummaryMixin(serializers.Serializer):
         return min((detail.delivery_time_in_days for detail in obj.details.all()), default=None)
 
 
-class OfferListSerializer(OfferSummaryMixin, serializers.ModelSerializer):
+class OfferListSerializer(OfferSummaryMixin, APIModelSerializer):
     """Serialize offers for the paginated list."""
 
     user = serializers.IntegerField(source='user_id', read_only=True)
@@ -185,7 +186,7 @@ class OfferDetailLinkSerializer(serializers.Serializer):
         return request.build_absolute_uri(path) if request else path
 
 
-class OfferDetailReadOnlySerializer(OfferSummaryMixin, serializers.ModelSerializer):
+class OfferDetailReadOnlySerializer(OfferSummaryMixin, APIModelSerializer):
     """Serialize a single offer with detail links."""
 
     details = OfferDetailLinkSerializer(many=True, read_only=True)
@@ -200,7 +201,7 @@ class OfferDetailReadOnlySerializer(OfferSummaryMixin, serializers.ModelSerializ
         )
 
 
-class OfferCreateResponseSerializer(serializers.ModelSerializer):
+class OfferCreateResponseSerializer(APIModelSerializer):
     """Serialize a created or updated offer with full detail data."""
 
     image = serializers.SerializerMethodField()

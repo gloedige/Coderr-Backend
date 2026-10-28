@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
+from core.api.serializers import APIModelSerializer
 from marketplace_app.models import Order, Review
 
 
@@ -57,7 +58,7 @@ def create_review(customer, business, validated_data):
         ) from exc
 
 
-class ReviewReadSerializer(serializers.ModelSerializer):
+class ReviewReadSerializer(APIModelSerializer):
     """Serialize review fields returned by list, create, and update endpoints."""
 
     class Meta:

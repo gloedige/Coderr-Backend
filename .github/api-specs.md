@@ -9,7 +9,7 @@ Diese Spezifikation wurde aus [api-doku.html](../api-doku.html) abgeleitet und u
 - **Authentifizierung:** DRF-Tokenauthentifizierung über `Authorization: Token <token>`. Registrierung, Login, öffentliche Angebotsliste und Basisinformationen sind nicht authentifizierungspflichtig; für andere Endpunkte gelten die jeweiligen Angaben.
 - **Ratenbegrenzung:** Für die dokumentierten Endpunkte ist kein Limit angegeben.
 - Pfadparameter in geschweiften Klammern, z. B. `{id}`, müssen durch den jeweiligen Wert ersetzt werden.
-- Datumswerte werden als ISO-8601-Strings zurückgegeben.
+- Datumswerte werden in allen API-Responses als UTC-ISO-8601-Strings mit genau zwei Nachkommastellen bei den Sekunden und `Z`-Zeitzonenmarker zurückgegeben, z. B. `2026-10-28T12:51:58.26Z`.
 - Benutzerrollen sind `customer` und `business`. Usernames werden nach äußerem Whitespace-Trim case-sensitiv eindeutig behandelt und behalten ihre Schreibweise. E-Mail-Adressen werden außen getrimmt, kleingeschrieben und case-insensitiv eindeutig behandelt.
 - Fehler bei ungültigen Eingaben verwenden DRF-Feldfehler. Authentifizierungs-, Berechtigungs- und Nichtgefunden-Fehler verwenden ein JSON-Objekt mit `detail`. Interne Fehlerdetails werden nicht zurückgegeben.
 - Datei-Uploads akzeptieren JPEG und PNG bis maximal 5 MB. Responses enthalten nur den Dateinamen, keine URL. Bei PATCH bedeutet ein ausgelassenes Bildfeld „unverändert“; der Multipart-Textwert `null` löscht das Bild.
@@ -89,7 +89,7 @@ Liefert das vollständige Profil des Benutzers `{pk}`. Authentifizierung erforde
   "working_hours": "9-17",
   "type": "business",
   "email": "max@business.de",
-  "created_at": "2023-01-01T12:00:00Z"
+  "created_at": "2023-01-01T12:00:00.00Z"
 }
 ```
 
@@ -155,7 +155,7 @@ Liefert eine Liste der Kundenprofile. Authentifizierung erforderlich. `uploaded_
     "first_name": "Jane",
     "last_name": "Doe",
     "file": "profile_picture_customer.jpg",
-    "uploaded_at": "2023-09-15T09:00:00",
+    "uploaded_at": "2023-09-15T09:00:00.00Z",
     "type": "customer"
   }
 ]
@@ -193,8 +193,8 @@ Liefert Angebote mit Angebotsdetails, Mindestpreis und kürzester Lieferzeit. Ke
       "title": "Website Design",
       "image": null,
       "description": "Professionelles Website-Design...",
-      "created_at": "2024-09-25T10:00:00Z",
-      "updated_at": "2024-09-28T12:00:00Z",
+      "created_at": "2024-09-25T10:00:00.00Z",
+      "updated_at": "2024-09-28T12:00:00.00Z",
       "details": [
         { "id": 1, "url": "/offerdetails/1/" },
         { "id": 2, "url": "/offerdetails/2/" },
@@ -271,8 +271,8 @@ Liefert ein einzelnes Angebot und dessen Detail-URLs. Authentifizierung erforder
   "title": "Grafikdesign-Paket",
   "image": null,
   "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
-  "created_at": "2025-01-23T07:44:15.365773Z",
-  "updated_at": "2025-01-23T07:44:15.365773Z",
+  "created_at": "2025-01-23T07:44:15.36Z",
+  "updated_at": "2025-01-23T07:44:15.36Z",
   "details": [
     { "id": 199, "url": "http://127.0.0.1:8000/api/offerdetails/199/" },
     { "id": 200, "url": "http://127.0.0.1:8000/api/offerdetails/200/" },
@@ -356,8 +356,8 @@ Liefert Bestellungen, bei denen der angemeldete Benutzer Kunde oder Geschäftspa
     "features": ["Logo Design", "Visitenkarten"],
     "offer_type": "basic",
     "status": "in_progress",
-    "created_at": "2024-09-29T10:00:00Z",
-    "updated_at": "2024-09-30T12:00:00Z"
+    "created_at": "2024-09-29T10:00:00.00Z",
+    "updated_at": "2024-09-30T12:00:00.00Z"
   }
 ]
 ```
@@ -450,8 +450,8 @@ Liefert Bewertungen; alle authentifizierten Benutzer dürfen lesen. Filterung un
     "reviewer": 3,
     "rating": 4,
     "description": "Sehr professioneller Service.",
-    "created_at": "2023-10-30T10:00:00Z",
-    "updated_at": "2023-10-31T10:00:00Z"
+    "created_at": "2023-10-30T10:00:00.00Z",
+    "updated_at": "2023-10-31T10:00:00.00Z"
   }
 ]
 ```

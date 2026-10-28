@@ -1,46 +1,51 @@
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.utils import timezone
-from PIL import Image, UnidentifiedImageError
 from rest_framework import serializers
 
 from accounts_app.models import Profile
+from core.api.utils import (
+    file_basename,
+    null_text_to_none,
+    schedule_replaced_file_deletion,
+    validate_image_upload,
+)
 
 
 User = get_user_model()
-MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024
-ALLOWED_PROFILE_IMAGE_FORMATS = {'JPEG', 'PNG'}
 
 
-class ProfileDetailSerializer(serializers.ModelSerializer):
+class ProfileBaseSerializer(serializers.ModelSerializer):
+    """Shared read-only user fields and file basename for profile responses."""
+
     user = serializers.IntegerField(source='user_id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     type = serializers.CharField(source='user.type', read_only=True)
-    email = serializers.EmailField(source='user.email', read_only=True)
     file = serializers.SerializerMethodField()
 
+    def get_file(self, obj):
+        """Return the profile image base name or None."""
+        return file_basename(obj.file)
+
+
+class ProfileDetailSerializer(ProfileBaseSerializer):
+    """Serialize the complete profile including email and creation time."""
+
+    email = serializers.EmailField(source='user.email', read_only=True)
+
     class Meta:
+        """Expose the full profile field set."""
+
         model = Profile
         fields = (
-            'user',
-            'username',
-            'first_name',
-            'last_name',
-            'file',
-            'location',
-            'tel',
-            'description',
-            'working_hours',
-            'type',
-            'email',
-            'created_at',
+            'user', 'username', 'first_name', 'last_name', 'file', 'location',
+            'tel', 'description', 'working_hours', 'type', 'email', 'created_at',
         )
-
-    def get_file(self, obj):
-        return obj.file.name.rsplit('/', 1)[-1] if obj.file else None
 
 
 class ProfileUpdateSerializer(serializers.Serializer):
+    """Validate partial profile updates and apply them atomically."""
+
     first_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
     last_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
     location = serializers.CharField(max_length=255, required=False, allow_blank=True)
@@ -51,12 +56,11 @@ class ProfileUpdateSerializer(serializers.Serializer):
     file = serializers.FileField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
-        if data.get('file') == 'null':
-            data = data.copy()
-            data['file'] = None
-        return super().to_internal_value(data)
+        """Treat the multipart text 'null' for `file` as a request to clear the image."""
+        return super().to_internal_value(null_text_to_none(data, 'file'))
 
     def validate_email(self, value):
+        """Normalize the email and reject addresses used by another account."""
         normalized_email = value.strip().lower()
         user = self.context['user']
         if User.objects.filter(email__iexact=normalized_email).exclude(pk=user.pk).exists():
@@ -64,108 +68,73 @@ class ProfileUpdateSerializer(serializers.Serializer):
         return normalized_email
 
     def validate_file(self, value):
-        if value is None:
-            return value
-        if value.size > MAX_PROFILE_IMAGE_SIZE:
-            raise serializers.ValidationError('Image must not exceed 5 MB.')
-        try:
-            image = Image.open(value)
-            image.verify()
-        except (UnidentifiedImageError, OSError, ValueError) as exc:
-            raise serializers.ValidationError('Only valid JPEG and PNG images are accepted.') from exc
-        if image.format not in ALLOWED_PROFILE_IMAGE_FORMATS:
-            raise serializers.ValidationError('Only JPEG and PNG images are accepted.')
-        value.seek(0)
-        return value
+        """Accept only JPEG/PNG images up to 5 MB, or None to clear."""
+        return validate_image_upload(value)
 
     def validate(self, attrs):
+        """Reject business-only fields submitted for non-business profiles."""
         profile = self.context['profile']
-        if profile.user.type != User.UserType.BUSINESS:
-            forbidden = {'description', 'working_hours'} & attrs.keys()
-            if forbidden:
-                raise serializers.ValidationError(
-                    {field: 'This field is only editable for business profiles.' for field in forbidden}
-                )
+        forbidden = {'description', 'working_hours'} & attrs.keys()
+        if profile.user.type != User.UserType.BUSINESS and forbidden:
+            raise serializers.ValidationError(
+                {field: 'This field is only editable for business profiles.' for field in forbidden}
+            )
         return attrs
 
     def update_profile(self):
-        profile = self.context['profile']
-        user = self.context['user']
+        """Apply validated changes atomically and return the updated profile."""
+        profile, user = self.context['profile'], self.context['user']
         data = dict(self.validated_data)
         email = data.pop('email', None)
         file_value = data.pop('file', serializers.empty)
         previous_file = profile.file
-        previous_file_name = previous_file.name if previous_file else None
-
         try:
             with transaction.atomic():
-                if email is not None:
-                    user.email = email
-                    user.save(update_fields=['email'])
-                for field, value in data.items():
-                    setattr(profile, field, value)
-                if file_value is not serializers.empty:
-                    profile.file = file_value
-                    if file_value is not None:
-                        profile.uploaded_at = timezone.now()
-                profile.save()
-                if (
-                    file_value is not serializers.empty
-                    and previous_file_name
-                    and previous_file_name != (profile.file.name if profile.file else None)
-                ):
-                    transaction.on_commit(
-                        lambda: previous_file.storage.delete(previous_file_name)
-                    )
+                self.apply_changes(profile, user, data, email, file_value)
+                schedule_replaced_file_deletion(previous_file, profile.file)
         except IntegrityError as exc:
-            raise serializers.ValidationError(
-                {'email': 'This email is already in use.'}
-            ) from exc
+            raise serializers.ValidationError({'email': 'This email is already in use.'}) from exc
         return profile
 
+    def apply_changes(self, profile, user, data, email, file_value):
+        """Persist the email, text fields, and image change for one profile update."""
+        if email is not None:
+            user.email = email
+            user.save(update_fields=['email'])
+        for field, value in data.items():
+            setattr(profile, field, value)
+        self.apply_file(profile, file_value)
+        profile.save()
 
-class BusinessProfileListSerializer(serializers.ModelSerializer):
-    user = serializers.IntegerField(source='user_id', read_only=True)
-    username = serializers.CharField(source='user.username', read_only=True)
-    type = serializers.CharField(source='user.type', read_only=True)
-    file = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Profile
-        fields = (
-            'user',
-            'username',
-            'first_name',
-            'last_name',
-            'file',
-            'location',
-            'tel',
-            'description',
-            'working_hours',
-            'type',
-        )
-
-    def get_file(self, obj):
-        return obj.file.name.rsplit('/', 1)[-1] if obj.file else None
+    def apply_file(self, profile, file_value):
+        """Set or clear the profile image unless the field was omitted."""
+        if file_value is serializers.empty:
+            return
+        profile.file = file_value
+        if file_value is not None:
+            profile.uploaded_at = timezone.now()
 
 
-class CustomerProfileListSerializer(serializers.ModelSerializer):
-    user = serializers.IntegerField(source='user_id', read_only=True)
-    username = serializers.CharField(source='user.username', read_only=True)
-    type = serializers.CharField(source='user.type', read_only=True)
-    file = serializers.SerializerMethodField()
+class BusinessProfileListSerializer(ProfileBaseSerializer):
+    """Serialize business profiles for the business list endpoint."""
 
     class Meta:
+        """Expose the business list field set."""
+
         model = Profile
         fields = (
-            'user',
-            'username',
-            'first_name',
-            'last_name',
-            'file',
-            'uploaded_at',
-            'type',
+            'user', 'username', 'first_name', 'last_name', 'file', 'location',
+            'tel', 'description', 'working_hours', 'type',
         )
 
-    def get_file(self, obj):
-        return obj.file.name.rsplit('/', 1)[-1] if obj.file else None
+
+class CustomerProfileListSerializer(ProfileBaseSerializer):
+    """Serialize customer profiles including the last image upload time."""
+
+    class Meta:
+        """Expose the customer list field set."""
+
+        model = Profile
+        fields = (
+            'user', 'username', 'first_name', 'last_name', 'file', 'uploaded_at', 'type',
+        )

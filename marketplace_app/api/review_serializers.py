@@ -61,6 +61,8 @@ class ReviewReadSerializer(serializers.ModelSerializer):
     """Serialize review fields returned by list, create, and update endpoints."""
 
     class Meta:
+        """Expose all review fields as read-only."""
+
         model = Review
         fields = (
             'id',

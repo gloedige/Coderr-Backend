@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from accounts_app.models import Profile
+from core.api.serializers import APIModelSerializer
 from core.api.utils import (
     file_basename,
     null_text_to_none,
@@ -15,7 +16,7 @@ from core.api.utils import (
 User = get_user_model()
 
 
-class ProfileBaseSerializer(serializers.ModelSerializer):
+class ProfileBaseSerializer(APIModelSerializer):
     """Shared read-only user fields and file basename for profile responses."""
 
     user = serializers.IntegerField(source='user_id', read_only=True)

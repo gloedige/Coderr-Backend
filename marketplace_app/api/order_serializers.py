@@ -3,6 +3,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, ValidationError
 
+from core.api.serializers import APIModelSerializer
 from marketplace_app.models import OfferDetail, Order
 
 
@@ -23,7 +24,7 @@ def order_snapshot(detail):
     }
 
 
-class OrderReadSerializer(serializers.ModelSerializer):
+class OrderReadSerializer(APIModelSerializer):
     """Serialize orders for list, create, and status-update responses."""
 
     class Meta:

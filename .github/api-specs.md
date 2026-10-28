@@ -9,7 +9,7 @@ Diese Spezifikation wurde aus [api-doku.html](../api-doku.html) abgeleitet und u
 - **Authentifizierung:** DRF-Tokenauthentifizierung über `Authorization: Token <token>`. Registrierung, Login, öffentliche Angebotsliste und Basisinformationen sind nicht authentifizierungspflichtig; für andere Endpunkte gelten die jeweiligen Angaben.
 - **Ratenbegrenzung:** Für die dokumentierten Endpunkte ist kein Limit angegeben.
 - Pfadparameter in geschweiften Klammern, z. B. `{id}`, müssen durch den jeweiligen Wert ersetzt werden.
-- Datumswerte werden als ISO-8601-Strings zurückgegeben.
+- Datumswerte werden in allen API-Responses als UTC-ISO-8601-Strings ohne Nachkommastellen bei den Sekunden und mit `Z`-Zeitzonenmarker zurückgegeben, z. B. `2026-10-28T12:51:58Z`.
 - Benutzerrollen sind `customer` und `business`. Usernames werden nach äußerem Whitespace-Trim case-sensitiv eindeutig behandelt und behalten ihre Schreibweise. E-Mail-Adressen werden außen getrimmt, kleingeschrieben und case-insensitiv eindeutig behandelt.
 - Fehler bei ungültigen Eingaben verwenden DRF-Feldfehler. Authentifizierungs-, Berechtigungs- und Nichtgefunden-Fehler verwenden ein JSON-Objekt mit `detail`. Interne Fehlerdetails werden nicht zurückgegeben.
 - Datei-Uploads akzeptieren JPEG und PNG bis maximal 5 MB. Responses enthalten nur den Dateinamen, keine URL. Bei PATCH bedeutet ein ausgelassenes Bildfeld „unverändert“; der Multipart-Textwert `null` löscht das Bild.
@@ -155,7 +155,7 @@ Liefert eine Liste der Kundenprofile. Authentifizierung erforderlich. `uploaded_
     "first_name": "Jane",
     "last_name": "Doe",
     "file": "profile_picture_customer.jpg",
-    "uploaded_at": "2023-09-15T09:00:00",
+    "uploaded_at": "2023-09-15T09:00:00Z",
     "type": "customer"
   }
 ]
@@ -271,8 +271,8 @@ Liefert ein einzelnes Angebot und dessen Detail-URLs. Authentifizierung erforder
   "title": "Grafikdesign-Paket",
   "image": null,
   "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
-  "created_at": "2025-01-23T07:44:15.365773Z",
-  "updated_at": "2025-01-23T07:44:15.365773Z",
+  "created_at": "2025-01-23T07:44:15Z",
+  "updated_at": "2025-01-23T07:44:15Z",
   "details": [
     { "id": 199, "url": "http://127.0.0.1:8000/api/offerdetails/199/" },
     { "id": 200, "url": "http://127.0.0.1:8000/api/offerdetails/200/" },

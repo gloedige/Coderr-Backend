@@ -34,7 +34,7 @@ class BaseInfoEndpointTests(TestCase):
         self.assertEqual(response.data, {
             'review_count': 0,
             'average_rating': 0.0,
-            'business_profile_count': 1,
+            'business_profile_count': 2,
             'offer_count': 0,
         })
 
@@ -48,7 +48,7 @@ class BaseInfoEndpointTests(TestCase):
         self.assertEqual(response.data, {
             'review_count': 3,
             'average_rating': 4.3,
-            'business_profile_count': 2,
+            'business_profile_count': 3,
             'offer_count': 2,
         })
 

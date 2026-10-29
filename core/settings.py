@@ -32,8 +32,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'accounts_app',
-    'marketplace_app',
+    'auth_app',
+    'profile_app',
+    'offers_app',
+    'orders_app',
+    'reviews_app',
+    'base_app',
 ]
 
 MIDDLEWARE = [
@@ -73,7 +77,7 @@ DATABASES = {
 
 # Password rules are validated by the registration API (minimum 4 characters).
 AUTH_PASSWORD_VALIDATORS = []
-AUTH_USER_MODEL = 'accounts_app.User'
+AUTH_USER_MODEL = 'auth_app.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

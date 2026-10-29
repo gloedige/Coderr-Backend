@@ -25,10 +25,10 @@ class ProjectFoundationTests(SimpleTestCase):
         self.assertEqual(settings.MEDIA_URL, '/media/')
         self.assertEqual(settings.MEDIA_ROOT, str(settings.BASE_DIR / 'media'))
 
-    def test_account_and_marketplace_apps_are_installed(self):
-        """Account and marketplace apps are in INSTALLED_APPS."""
-        self.assertIn('accounts_app', settings.INSTALLED_APPS)
-        self.assertIn('marketplace_app', settings.INSTALLED_APPS)
+    def test_domain_apps_are_installed(self):
+        """All domain apps are in INSTALLED_APPS."""
+        for app in ('auth_app', 'profile_app', 'offers_app', 'orders_app', 'reviews_app', 'base_app'):
+            self.assertIn(app, settings.INSTALLED_APPS)
 
 
 

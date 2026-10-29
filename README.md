@@ -10,6 +10,7 @@
 Coderr ist eine Plattform zur Vermittlung von Freelancer-Dienstleistungen – ähnlich wie Fiverr. Dieses Repository enthält die Django-REST-API des Projekts. Das dazugehörige Frontend wird in einem separaten Repository gepflegt.
 
 - **Frontend:** [Developer-Akademie-Backendkurs/project.Coderr](https://github.com/Developer-Akademie-Backendkurs/project.Coderr)
+- **API-Dokumentation:** [api-specs.md](.github/api-specs.md)
 - **Lizenz:** MIT (siehe [LICENSE](LICENSE))
 
 ## Inhaltsverzeichnis

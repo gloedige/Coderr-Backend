@@ -10,7 +10,6 @@
 Coderr ist eine Plattform zur Vermittlung von Freelancer-Dienstleistungen – ähnlich wie Fiverr. Dieses Repository enthält die Django-REST-API des Projekts. Das dazugehörige Frontend wird in einem separaten Repository gepflegt.
 
 - **Frontend:** [Developer-Akademie-Backendkurs/project.Coderr](https://github.com/Developer-Akademie-Backendkurs/project.Coderr)
-- **API-Dokumentation:** [api-doku.html](api-doku.html)
 - **Lizenz:** MIT (siehe [LICENSE](LICENSE))
 
 ## Inhaltsverzeichnis
@@ -48,7 +47,6 @@ Coderr-Backend/
 ├── marketplace_app/     # Angebote, Bestellungen und Bewertungen
 │   ├── api/             # Featurebezogene API-Module und Tests
 │   └── migrations/
-├── api-doku.html        # API-Dokumentation
 ├── manage.py
 ├── requirements.txt
 └── db.sqlite3           # lokale Entwicklungsdatenbank (wird bei Bedarf erstellt)
@@ -79,7 +77,7 @@ Die folgenden Bezeichnungen beschreiben die sichtbaren Anwendungsbereiche. Im ak
 | Login | `login.html` | Mit Benutzername und Passwort anmelden oder einen Kunden-/Anbieter-Gastzugang auswählen |
 | Registrierung | `registration.html` | Ein Kunden- oder Anbieterkonto erstellen |
 
-Wichtige API-Routen sind unter anderem `/api/login/`, `/api/registration/`, `/api/offers/`, `/api/orders/`, `/api/reviews/` und `/api/base-info/`. Vollständige Details stehen in der [API-Dokumentation](api-doku.html).
+Wichtige API-Routen sind unter anderem `/api/login/`, `/api/registration/`, `/api/offers/`, `/api/orders/`, `/api/reviews/` und `/api/base-info/`.
 
 ## Gast-Zugänge
 
@@ -141,4 +139,4 @@ Führe die Tests mit dem integrierten Django-Test-Runner aus:
 python manage.py test
 ```
 
-Die API kann beispielsweise mit Postman getestet werden. Starte zuerst den lokalen Server, verwende anschließend die Routen aus der [API-Dokumentation](api-doku.html) und sende bei geschützten Endpunkten das Token als `Authorization: Token <token>`.
+Die API kann beispielsweise mit Postman getestet werden. Starte zuerst den lokalen Server, verwende anschließend die Routen aus den urls.py files und sende bei geschützten Endpunkten das Token als `Authorization: Token <token>`.

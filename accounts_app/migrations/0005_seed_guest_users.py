@@ -18,6 +18,10 @@ def seed_guest_users(apps, schema_editor):
     Token = apps.get_model('authtoken', 'Token')
     database = schema_editor.connection.alias
 
+    create_guest_users(database, User, Profile, Token)
+
+def create_guest_users(database, User, Profile, Token):
+    """Create the registration-equivalent guest accounts, profiles, and tokens."""
     for username, email, user_type in GUEST_USERS:
         user, created = User.objects.using(database).get_or_create(
             username=username,
@@ -32,7 +36,6 @@ def seed_guest_users(apps, schema_editor):
             user_id=user.pk,
             defaults={'key': secrets.token_hex(20)},
         )
-
 
 class Migration(migrations.Migration):
     dependencies = [

@@ -32,7 +32,7 @@ class ProfileBaseSerializer(APIModelSerializer):
 class ProfileDetailSerializer(ProfileBaseSerializer):
     """Serialize the complete profile including email and creation time."""
 
-    email = serializers.EmailField(source='user.email', read_only=True)
+    email = serializers.EmailField(source='user.email')
 
     class Meta:
         """Expose the full profile field set."""
@@ -51,9 +51,9 @@ class ProfileUpdateSerializer(serializers.Serializer):
     last_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
     location = serializers.CharField(max_length=255, required=False, allow_blank=True)
     tel = serializers.CharField(max_length=50, required=False, allow_blank=True)
-    email = serializers.EmailField(max_length=254, required=False)
     description = serializers.CharField(max_length=500, required=False, allow_blank=True)
     working_hours = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    email = serializers.EmailField(max_length=254, required=False, allow_blank=True)
     file = serializers.FileField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
@@ -77,6 +77,8 @@ class ProfileUpdateSerializer(serializers.Serializer):
         profile, user = self.context['profile'], self.context['user']
         data = dict(self.validated_data)
         email = data.pop('email', None)
+        profile.user = user
+        profile.email = email if email is not None else profile.email
         file_value = data.pop('file', serializers.empty)
         previous_file = profile.file
         try:

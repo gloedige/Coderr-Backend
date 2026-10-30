@@ -77,9 +77,7 @@ class ProfileUpdateSerializer(serializers.Serializer):
         profile = self.context['profile']
         user = profile.user
         data = dict(self.validated_data)
-        print(f"Validated data: {data}")
-        email = data.pop('email', None)
-        print(f"Email: {email}")
+email = data.pop('email', None)
         file_value = data.pop('file', serializers.empty)
         previous_file = profile.file
         try:

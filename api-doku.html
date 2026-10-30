@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<!-- saved from url=(0085)https://cdn.developerakademie.com/courses/Backend/EndpointDoku/index.html?name=coderr -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endpoint Dokumentation</title>
+    <link rel="icon" href="https://cdn.developerakademie.com/courses/Backend/EndpointDoku/assets/icons/Da_favicon.svg" type="image/x-icon"> 
+    <link rel="stylesheet" href="./api-doku_files/da_stylesheet.css">
+    <link rel="stylesheet" href="./api-doku_files/fonts.css">
+    <link rel="stylesheet" href="./api-doku_files/scrollbar.css">
+    <link rel="stylesheet" href="./api-doku_files/standard.css">
+    <link rel="stylesheet" href="./api-doku_files/style.css">
+    <link rel="stylesheet" href="./api-doku_files/pre_styling.css">
+   
+  </head>
+
+  <body onload="getAndRenderDocu()" cz-shortcut-listen="true">
+    <header class="section_pad main-header">
+      <img src="./api-doku_files/header_logo.svg" alt="">
+    </header>
+    
+    <main id="endpoints" class="section_gap section_pad">
+      <h1 class=""><strong id="docu_title">coderr</strong> API Endpoint Dokumentation</h1>
+    <section class="endpoint-section">
+      <header>
+        <h2>Authentication</h2>
+        <p>Login und Registrierung</p>
+      </header>
+    <div class="endpoint-container" data-index="0-0">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="0-0">
+      <div class="endpoint-checkbox" data-index="0-0" onclick="updateBackgroundColor('0-0', event)"> 
+        <input type="checkbox" class="checkbox" data-index="0-0">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-post">POST</p>
+        <h3>/api/registration/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Erstellt einen neuen Benutzer. Dieser Benutzer kann entweder ein Customer- oder Business-User sein.
+    </div>
+    
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"username"</span>: <span class="string">"exampleUsername"</span>,
+  <span class="key">"email"</span>: <span class="string">"example@mail.de"</span>,
+  <span class="key">"password"</span>: <span class="string">"examplePassword"</span>,
+  <span class="key">"repeated_password"</span>: <span class="string">"examplePassword"</span>,
+  <span class="key">"type"</span>: <span class="string">"customer"</span>
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Erfolgreicher Erstellung gibt dies ein Token sowie die Benutzerinformationen zurück, inklusive die einzigartige Nutzer-ID.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"token"</span>: <span class="string">"83bf098723b08f7b23429u0fv8274"</span>,
+  <span class="key">"username"</span>: <span class="string">"exampleUsername"</span>,
+  <span class="key">"email"</span>: <span class="string">"example@mail.de"</span>,
+  <span class="key">"user_id"</span>: <span class="number">123</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>201:</strong> Der Benutzer wurde erfolgreich erstellt.</li>
+      
+        <li><strong>400:</strong> Ungültige Anfragedaten.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>No Permissions required</strong></div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="0-1">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="0-1">
+      <div class="endpoint-checkbox" data-index="0-1" onclick="updateBackgroundColor('0-1', event)"> 
+        <input type="checkbox" class="checkbox" data-index="0-1">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-post">POST</p>
+        <h3>/api/login/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Authentifiziert einen Benutzer und liefert ein Authentifizierungs-Token zurück, das für weitere API-Anfragen genutzt wird.
+    </div>
+    
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"username"</span>: <span class="string">"exampleUsername"</span>,
+  <span class="key">"password"</span>: <span class="string">"examplePassword"</span>
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Erfolgreiche Authentifizierung gibt ein Token sowie Benutzerinformationen zurück.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"token"</span>: <span class="string">"83bf098723b08f7b23429u0fv8274"</span>,
+  <span class="key">"username"</span>: <span class="string">"exampleUsername"</span>,
+  <span class="key">"email"</span>: <span class="string">"example@mail.de"</span>,
+  <span class="key">"user_id"</span>: <span class="number">123</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Erfolgreiche Anmeldung.</li>
+      
+        <li><strong>400:</strong> Ungültige Anfragedaten.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>No Permissions required</strong></div>
+    
+  
+    </div>
+  </div></section><section class="endpoint-section">
+      <header>
+        <h2>Profile</h2>
+        <p>Alles an CRUD das für das Frontend eine Rolle spielt</p>
+      </header>
+    <div class="endpoint-container" data-index="1-0">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="1-0">
+      <div class="endpoint-checkbox" data-index="1-0" onclick="updateBackgroundColor('1-0', event)"> 
+        <input type="checkbox" class="checkbox" data-index="1-0">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/profile/{pk}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Ruft die detaillierten Informationen eines Benutzerprofils ab (sowohl für Kunden- als auch für Geschäftsnutzer). Ermöglicht auch das Bearbeiten der Profildaten (PATCH).
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>pk</td>
+            <td>-</td>
+            <td>Die ID des Benutzers, dessen Profil abgerufen oder bearbeitet wird.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält die vollständigen Profildaten eines spezifischen Benutzers. Die Felder first_name, last_name, location, tel, description und working_hours dürfen im Response nicht null sein, sondern müssen, falls keine Werte vorhanden sind, mit einem leeren String ('' '') belegt werden.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"user"</span>: <span class="number">1</span>,
+  <span class="key">"username"</span>: <span class="string">"max_mustermann"</span>,
+  <span class="key">"first_name"</span>: <span class="string">"Max"</span>,
+  <span class="key">"last_name"</span>: <span class="string">"Mustermann"</span>,
+  <span class="key">"file"</span>: <span class="string">"profile_picture.jpg"</span>,
+  <span class="key">"location"</span>: <span class="string">"Berlin"</span>,
+  <span class="key">"tel"</span>: <span class="string">"123456789"</span>,
+  <span class="key">"description"</span>: <span class="string">"Business description"</span>,
+  <span class="key">"working_hours"</span>: <span class="string">"9-17"</span>,
+  <span class="key">"type"</span>: <span class="string">"business"</span>,
+  <span class="key">"email"</span>: <span class="string">"max@business.de"</span>,
+  <span class="key">"created_at"</span>: <span class="string">"2023-01-01T12:00:00Z"</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Die Profildaten wurden erfolgreich abgerufen.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>404:</strong> Das Benutzerprofil wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein.</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="1-1">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="1-1">
+      <div class="endpoint-checkbox" data-index="1-1" onclick="updateBackgroundColor('1-1', event)"> 
+        <input type="checkbox" class="checkbox" data-index="1-1">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-patch">PATCH</p>
+        <h3>/api/profile/{pk}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Ermöglicht es einem Benutzer, bestimmte Profilinformationen zu aktualisieren.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>pk</td>
+            <td>-</td>
+            <td>Die ID des Benutzers, dessen Profil bearbeitet wird.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"first_name"</span>: <span class="string">"Max"</span>,
+  <span class="key">"last_name"</span>: <span class="string">"Mustermann"</span>,
+  <span class="key">"location"</span>: <span class="string">"Berlin"</span>,
+  <span class="key">"tel"</span>: <span class="string">"987654321"</span>,
+  <span class="key">"description"</span>: <span class="string">"Updated business description"</span>,
+  <span class="key">"working_hours"</span>: <span class="string">"10-18"</span>,
+  <span class="key">"email"</span>: <span class="string">"new_email@business.de"</span>
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält das aktualisierte Profil des Benutzers. Die Felder first_name, last_name, location, tel, description und working_hours dürfen im Response nicht null sein, sondern müssen, falls keine Werte vorhanden sind, mit einem leeren String ('' '') belegt werden.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"user"</span>: <span class="number">1</span>,
+  <span class="key">"username"</span>: <span class="string">"max_mustermann"</span>,
+  <span class="key">"first_name"</span>: <span class="string">"Max"</span>,
+  <span class="key">"last_name"</span>: <span class="string">"Mustermann"</span>,
+  <span class="key">"file"</span>: <span class="string">"profile_picture.jpg"</span>,
+  <span class="key">"location"</span>: <span class="string">"Berlin"</span>,
+  <span class="key">"tel"</span>: <span class="string">"987654321"</span>,
+  <span class="key">"description"</span>: <span class="string">"Updated business description"</span>,
+  <span class="key">"working_hours"</span>: <span class="string">"10-18"</span>,
+  <span class="key">"type"</span>: <span class="string">"business"</span>,
+  <span class="key">"email"</span>: <span class="string">"new_email@business.de"</span>,
+  <span class="key">"created_at"</span>: <span class="string">"2023-01-01T12:00:00Z"</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Das Profil wurde erfolgreich aktualisiert.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert</li>
+      
+        <li><strong>403:</strong> Authentifizierter Benutzer ist nicht der Eigentümer Profils</li>
+      
+        <li><strong>404:</strong> Das Benutzerprofil wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer kann NUR sein eigenes Profil bearbeiten.</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="1-2">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="1-2">
+      <div class="endpoint-checkbox" data-index="1-2" onclick="updateBackgroundColor('1-2', event)"> 
+        <input type="checkbox" class="checkbox" data-index="1-2">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/profiles/business/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Gibt eine Liste aller Geschäftsnutzer auf der Plattform zurück.
+    </div>
+    
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält eine Liste aller Geschäftsnutzer mit ihren Profilinformationen. Die Felder first_name, last_name, location, tel, description und working_hours dürfen im Response nicht null sein, sondern müssen, falls keine Werte vorhanden sind, mit einem leeren String ('' '') belegt werden.</div>
+    <div class="response">
+      <pre>[
+  {
+    <span class="key">"user"</span>: <span class="number">1</span>,
+    <span class="key">"username"</span>: <span class="string">"max_business"</span>,
+    <span class="key">"first_name"</span>: <span class="string">"Max"</span>,
+    <span class="key">"last_name"</span>: <span class="string">"Mustermann"</span>,
+    <span class="key">"file"</span>: <span class="string">"profile_picture.jpg"</span>,
+    <span class="key">"location"</span>: <span class="string">"Berlin"</span>,
+    <span class="key">"tel"</span>: <span class="string">"123456789"</span>,
+    <span class="key">"description"</span>: <span class="string">"Business description"</span>,
+    <span class="key">"working_hours"</span>: <span class="string">"9-17"</span>,
+    <span class="key">"type"</span>: <span class="string">"business"</span>
+  }
+]</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Erfolgreiche Antwort mit der Liste der Geschäftsnutzer.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein.</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="1-3">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="1-3">
+      <div class="endpoint-checkbox" data-index="1-3" onclick="updateBackgroundColor('1-3', event)"> 
+        <input type="checkbox" class="checkbox" data-index="1-3">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/profiles/customer/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Gibt eine Liste aller Kundenprofile auf der Plattform zurück.
+    </div>
+    
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält eine Liste aller Kunden mit ihren Profilinformationen. Die Felder first_name, last_name, location, tel, description und working_hours dürfen im Response nicht null sein, sondern müssen, falls keine Werte vorhanden sind, mit einem leeren String ('' '') belegt werden.</div>
+    <div class="response">
+      <pre>[
+  {
+    <span class="key">"user"</span>: <span class="number">2</span>,
+    <span class="key">"username"</span>: <span class="string">"customer_jane"</span>,
+    <span class="key">"first_name"</span>: <span class="string">"Jane"</span>,
+    <span class="key">"last_name"</span>: <span class="string">"Doe"</span>,
+    <span class="key">"file"</span>: <span class="string">"profile_picture_customer.jpg"</span>,
+    <span class="key">"uploaded_at"</span>: <span class="string">"2023-09-15T09:00:00"</span>,
+    <span class="key">"type"</span>: <span class="string">"customer"</span>
+  }
+]</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Erfolgreiche Antwort mit der Liste der Kundenprofile.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein.</div>
+    
+  
+    </div>
+  </div></section><section class="endpoint-section">
+      <header>
+        <h2>Angebote (offers)</h2>
+        <p>Alles an CRUD das für das Frontend eine Rolle spielt</p>
+      </header>
+    <div class="endpoint-container" data-index="2-0">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="2-0">
+      <div class="endpoint-checkbox" data-index="2-0" onclick="updateBackgroundColor('2-0', event)"> 
+        <input type="checkbox" class="checkbox" data-index="2-0">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/offers/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Dieser Endpunkt gibt eine Liste von Angeboten zurück. Jedes Angebot enthält eine Übersicht der Angebotsdetails, den minimalen Preis und die kürzeste Lieferzeit.
+    </div>
+    
+    
+    <h4>Query Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>creator_id</td>
+            <td>integer</td>
+            <td>Filtert die Angebote nach dem Benutzer, der sie erstellt hat.</td>
+          </tr>
+        
+          <tr>
+            <td>min_price</td>
+            <td>float</td>
+            <td>Filtert Angebote mit einem Mindestpreis.</td>
+          </tr>
+        
+          <tr>
+            <td>max_delivery_time</td>
+            <td>integer</td>
+            <td>Filtert Angebote, deren Lieferzeit kürzer oder gleich dem angegebenen Wert ist.</td>
+          </tr>
+        
+          <tr>
+            <td>ordering</td>
+            <td>string</td>
+            <td>Sortiert die Angebote nach den Feldern 'updated_at' oder 'min_price'.</td>
+          </tr>
+        
+          <tr>
+            <td>search</td>
+            <td>string</td>
+            <td>Durchsucht die Felder 'title' und 'description' nach Übereinstimmungen.</td>
+          </tr>
+        
+          <tr>
+            <td>page_size</td>
+            <td>integer</td>
+            <td>Gibt an, wie viele Ergebnisse pro Seite zurückgegeben werden sollen. Dies sollte mit dem Frontend abgestimmt sein.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort ist eine paginierte Liste von Angeboten mit den zugehörigen Details.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"count"</span>: <span class="number">1</span>,
+  <span class="key">"next"</span>: <span class="string">"http://127.0.0.1:8000/api/offers/?page=2"</span>,
+  <span class="key">"previous"</span>: <span class="null">null</span>,
+  <span class="key">"results"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="number">1</span>,
+      <span class="key">"user"</span>: <span class="number">1</span>,
+      <span class="key">"title"</span>: <span class="string">"Website Design"</span>,
+      <span class="key">"image"</span>: <span class="null">null</span>,
+      <span class="key">"description"</span>: <span class="string">"Professionelles Website-Design..."</span>,
+      <span class="key">"created_at"</span>: <span class="string">"2024-09-25T10:00:00Z"</span>,
+      <span class="key">"updated_at"</span>: <span class="string">"2024-09-28T12:00:00Z"</span>,
+      <span class="key">"details"</span>: [
+        {
+          <span class="key">"id"</span>: <span class="number">1</span>,
+          <span class="key">"url"</span>: <span class="string">"/offerdetails/1/"</span>
+        },
+        {
+          <span class="key">"id"</span>: <span class="number">2</span>,
+          <span class="key">"url"</span>: <span class="string">"/offerdetails/2/"</span>
+        },
+        {
+          <span class="key">"id"</span>: <span class="number">3</span>,
+          <span class="key">"url"</span>: <span class="string">"/offerdetails/3/"</span>
+        }
+      ],
+      <span class="key">"min_price"</span>: <span class="number">100</span>,
+      <span class="key">"min_delivery_time"</span>: <span class="number">7</span>,
+      <span class="key">"user_details"</span>: {
+        <span class="key">"first_name"</span>: <span class="string">"John"</span>,
+        <span class="key">"last_name"</span>: <span class="string">"Doe"</span>,
+        <span class="key">"username"</span>: <span class="string">"jdoe"</span>
+      }
+    }
+  ]
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Die Anfrage war erfolgreich und eine Liste von Angeboten wurde zurückgegeben.</li>
+      
+        <li><strong>400:</strong> Ungültige Anfrageparameter.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>No Permissions required</strong></div>
+    <div class="extra-information"><strong>Extra Information:</strong> Die Antwort verwendet PageNumberPagination.</div>
+  
+    </div>
+  </div><div class="endpoint-container" data-index="2-1">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="2-1">
+      <div class="endpoint-checkbox" data-index="2-1" onclick="updateBackgroundColor('2-1', event)"> 
+        <input type="checkbox" class="checkbox" data-index="2-1">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-post">POST</p>
+        <h3>/api/offers/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Dieser Endpunkt ermöglicht es, ein neues Angebot (Offer) zu erstellen. Ein Offer muss 3 Details enthalten!
+    </div>
+    
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"title"</span>: <span class="string">"Grafikdesign-Paket"</span>,
+  <span class="key">"image"</span>: <span class="null">null</span>,
+  <span class="key">"description"</span>: <span class="string">"Ein umfassendes Grafikdesign-Paket für Unternehmen."</span>,
+  <span class="key">"details"</span>: [
+    {
+      <span class="key">"title"</span>: <span class="string">"Basic Design"</span>,
+      <span class="key">"revisions"</span>: <span class="number">2</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">5</span>,
+      <span class="key">"price"</span>: <span class="number">100</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Visitenkarte"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"basic"</span>
+    },
+    {
+      <span class="key">"title"</span>: <span class="string">"Standard Design"</span>,
+      <span class="key">"revisions"</span>: <span class="number">5</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">7</span>,
+      <span class="key">"price"</span>: <span class="number">200</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Visitenkarte"</span>,
+        <span class="string">"Briefpapier"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"standard"</span>
+    },
+    {
+      <span class="key">"title"</span>: <span class="string">"Premium Design"</span>,
+      <span class="key">"revisions"</span>: <span class="number">10</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">10</span>,
+      <span class="key">"price"</span>: <span class="number">500</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Visitenkarte"</span>,
+        <span class="string">"Briefpapier"</span>,
+        <span class="string">"Flyer"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"premium"</span>
+    }
+  ]
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Bei erfolgreicher Erstellung wird das Angebot mit den zugehörigen Details zurückgegeben, einschließlich IDs für das Angebot und jedes Detail.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"id"</span>: <span class="number">1</span>,
+  <span class="key">"title"</span>: <span class="string">"Grafikdesign-Paket"</span>,
+  <span class="key">"image"</span>: <span class="null">null</span>,
+  <span class="key">"description"</span>: <span class="string">"Ein umfassendes Grafikdesign-Paket für Unternehmen."</span>,
+  <span class="key">"details"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="number">1</span>,
+      <span class="key">"title"</span>: <span class="string">"Basic Design"</span>,
+      <span class="key">"revisions"</span>: <span class="number">2</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">5</span>,
+      <span class="key">"price"</span>: <span class="number">100</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Visitenkarte"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"basic"</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="number">2</span>,
+      <span class="key">"title"</span>: <span class="string">"Standard Design"</span>,
+      <span class="key">"revisions"</span>: <span class="number">5</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">7</span>,
+      <span class="key">"price"</span>: <span class="number">200</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Visitenkarte"</span>,
+        <span class="string">"Briefpapier"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"standard"</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="number">3</span>,
+      <span class="key">"title"</span>: <span class="string">"Premium Design"</span>,
+      <span class="key">"revisions"</span>: <span class="number">10</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">10</span>,
+      <span class="key">"price"</span>: <span class="number">500</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Visitenkarte"</span>,
+        <span class="string">"Briefpapier"</span>,
+        <span class="string">"Flyer"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"premium"</span>
+    }
+  ]
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>201:</strong> Das Angebot wurde erfolgreich erstellt.</li>
+      
+        <li><strong>400:</strong> Ungültige Anfragedaten oder unvollständige Details.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>403:</strong> Authentifizierter Benutzer ist kein 'business' Profil</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Nur User vom type 'business' dürfen Angebote erstellen</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="2-2">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="2-2">
+      <div class="endpoint-checkbox" data-index="2-2" onclick="updateBackgroundColor('2-2', event)"> 
+        <input type="checkbox" class="checkbox" data-index="2-2">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/offers/{id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Dieser Endpunkt gibt die Details eines spezifischen Angebots anhand der angegebenen ID zurück.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>id</td>
+            <td>-</td>
+            <td>Die ID des gewünschten Angebots.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Gibt die Details eines spezifischen Angebots, Angebotsdetails und Metadaten zurück. 'user' ist hier die ID des User der dieses Angebot erstellt hat.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"id"</span>: <span class="number">66</span>,
+  <span class="key">"user"</span>: <span class="number">114</span>,
+  <span class="key">"title"</span>: <span class="string">"Grafikdesign-Paket"</span>,
+  <span class="key">"image"</span>: <span class="null">null</span>,
+  <span class="key">"description"</span>: <span class="string">"Ein umfassendes Grafikdesign-Paket für Unternehmen."</span>,
+  <span class="key">"created_at"</span>: <span class="string">"2025-01-23T07:44:15.365773Z"</span>,
+  <span class="key">"updated_at"</span>: <span class="string">"2025-01-23T07:44:15.365773Z"</span>,
+  <span class="key">"details"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="number">199</span>,
+      <span class="key">"url"</span>: <span class="string">"http://127.0.0.1:8000/api/offerdetails/199/"</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="number">200</span>,
+      <span class="key">"url"</span>: <span class="string">"http://127.0.0.1:8000/api/offerdetails/200/"</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="number">201</span>,
+      <span class="key">"url"</span>: <span class="string">"http://127.0.0.1:8000/api/offerdetails/201/"</span>
+    }
+  ],
+  <span class="key">"min_price"</span>: <span class="number">50</span>,
+  <span class="key">"min_delivery_time"</span>: <span class="number">5</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Die Anfrage war erfolgreich, die Angebotsdetails wurden zurückgegeben.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert</li>
+      
+        <li><strong>404:</strong> Das Angebot mit der angegebenen ID wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein</div>
+    <div class="extra-information"><strong>Extra Information:</strong> Die Angebotsdetails enthalten die URLs zu den einzelnen Angebotsdetail-Objekten.</div>
+  
+    </div>
+  </div><div class="endpoint-container" data-index="2-3">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="2-3">
+      <div class="endpoint-checkbox" data-index="2-3" onclick="updateBackgroundColor('2-3', event)"> 
+        <input type="checkbox" class="checkbox" data-index="2-3">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-patch">PATCH</p>
+        <h3>/api/offers/{id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Aktualisiert ein spezifisches Angebot. Ein PATCH überschreibt nur die angegebenen Felder. Es müssen nicht alle Felder angegeben werden, nur die, die aktualisiert werden sollen.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>id</td>
+            <td>-</td>
+            <td>Die ID des zu aktualisierenden Angebots.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"title"</span>: <span class="string">"Updated Grafikdesign-Paket"</span>,
+  <span class="key">"details"</span>: [
+    {
+      <span class="key">"title"</span>: <span class="string">"Basic Design Updated"</span>,
+      <span class="key">"revisions"</span>: <span class="number">3</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">6</span>,
+      <span class="key">"price"</span>: <span class="number">120</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Flyer"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"basic"</span>
+    }
+  ]
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Gibt das aktualisierte Angebot mit allen Feldern zurück, unabhängig davon, welche Felder in der Anfrage angegeben wurden.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"id"</span>: <span class="number">66</span>,
+  <span class="key">"title"</span>: <span class="string">"Updated Grafikdesign-Paket"</span>,
+  <span class="key">"image"</span>: <span class="null">null</span>,
+  <span class="key">"description"</span>: <span class="string">"Ein umfassendes Grafikdesign-Paket für Unternehmen."</span>,
+  <span class="key">"details"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="number">199</span>,
+      <span class="key">"title"</span>: <span class="string">"Basic Design Updated"</span>,
+      <span class="key">"revisions"</span>: <span class="number">3</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">6</span>,
+      <span class="key">"price"</span>: <span class="number">120</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Flyer"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"basic"</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="number">200</span>,
+      <span class="key">"title"</span>: <span class="string">"Standard Design"</span>,
+      <span class="key">"revisions"</span>: <span class="number">5</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">10</span>,
+      <span class="key">"price"</span>: <span class="number">120</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Visitenkarte"</span>,
+        <span class="string">"Briefpapier"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"standard"</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="number">201</span>,
+      <span class="key">"title"</span>: <span class="string">"Premium Design"</span>,
+      <span class="key">"revisions"</span>: <span class="number">10</span>,
+      <span class="key">"delivery_time_in_days"</span>: <span class="number">10</span>,
+      <span class="key">"price"</span>: <span class="number">150</span>,
+      <span class="key">"features"</span>: [
+        <span class="string">"Logo Design"</span>,
+        <span class="string">"Visitenkarte"</span>,
+        <span class="string">"Briefpapier"</span>,
+        <span class="string">"Flyer"</span>
+      ],
+      <span class="key">"offer_type"</span>: <span class="string">"premium"</span>
+    }
+  ]
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Das Angebot wurde erfolgreich aktualisiert.</li>
+      
+        <li><strong>400:</strong> Ungültige Anfragedaten oder unvollständige Details.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert</li>
+      
+        <li><strong>403:</strong> Authentifizierter Benutzer ist nicht der Eigentümer des Angebots</li>
+      
+        <li><strong>404:</strong> Das Angebot mit der angegebenen ID wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Nur Ersteller des Angebotes können dies verändern.</div>
+    <div class="extra-information"><strong>Extra Information:</strong> Nur die angegebenen Felder werden aktualisiert. Alle nicht angegebenen Felder bleiben unverändert. Details können einzeln aktualisiert werden, wobei ihre IDs unverändert bleiben müssen. Desweiteren sollte der Typ (offer_type) immer mitgegeben werden, um das Detail eindeutig zu identifizieren.</div>
+  
+    </div>
+  </div><div class="endpoint-container" data-index="2-4">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="2-4">
+      <div class="endpoint-checkbox" data-index="2-4" onclick="updateBackgroundColor('2-4', event)"> 
+        <input type="checkbox" class="checkbox" data-index="2-4">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-delete">DELETE</p>
+        <h3>/api/offers/{id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Löscht ein spezifisches Angebot anhand der angegebenen ID.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>id</td>
+            <td>-</td>
+            <td>Die ID des zu löschenden Angebots.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Bei Erfolg wird ein HTTP-Statuscode 204 No Content zurückgegeben, ohne Inhalt in der Antwort.</div>
+    <div class="response">
+      <pre><span class="null">null</span></pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>204:</strong> Das Angebot wurde erfolgreich gelöscht.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert</li>
+      
+        <li><strong>403:</strong> Authentifizierter Benutzer ist nicht der Eigentümer des Angebots</li>
+      
+        <li><strong>404:</strong> Das Angebot mit der angegebenen ID wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Nur Ersteller des Angebotes können dies löschen.</div>
+    <div class="extra-information"><strong>Extra Information:</strong> Dieser Endpunkt gibt im Erfolgsfall keinen Antwortinhalt zurück, sondern nur den HTTP-Statuscode 204.</div>
+  
+    </div>
+  </div><div class="endpoint-container" data-index="2-5">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="2-5">
+      <div class="endpoint-checkbox" data-index="2-5" onclick="updateBackgroundColor('2-5', event)"> 
+        <input type="checkbox" class="checkbox" data-index="2-5">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/offerdetails/{id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Ruft die Details eines spezifischen Angebotsdetails ab.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>id</td>
+            <td>-</td>
+            <td>Die ID des Angebotsdetails, das abgerufen werden soll.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Gibt die vollständigen Details des Angebotsdetails zurück, einschließlich Titel, Preis, Lieferzeit, Features und Angebotstyp.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"id"</span>: <span class="number">1</span>,
+  <span class="key">"title"</span>: <span class="string">"Basic Design"</span>,
+  <span class="key">"revisions"</span>: <span class="number">2</span>,
+  <span class="key">"delivery_time_in_days"</span>: <span class="number">5</span>,
+  <span class="key">"price"</span>: <span class="number">100</span>,
+  <span class="key">"features"</span>: [
+    <span class="string">"Logo Design"</span>,
+    <span class="string">"Visitenkarte"</span>
+  ],
+  <span class="key">"offer_type"</span>: <span class="string">"basic"</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Das Angebotsdetail wurde erfolgreich abgerufen.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert</li>
+      
+        <li><strong>404:</strong> Das Angebotsdetail mit der angegebenen ID wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein.</div>
+    
+  
+    </div>
+  </div></section><section class="endpoint-section">
+      <header>
+        <h2>Bestellungen (orders)</h2>
+        <p>Alles an CRUD das für das Frontend eine Rolle spielt</p>
+      </header>
+    <div class="endpoint-container" data-index="3-0">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="3-0">
+      <div class="endpoint-checkbox" data-index="3-0" onclick="updateBackgroundColor('3-0', event)"> 
+        <input type="checkbox" class="checkbox" data-index="3-0">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/orders/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Gibt eine Liste der Bestellungen zurück, die entweder vom angemeldeten Benutzer als Kunde oder als Geschäftspartner erstellt wurden.
+    </div>
+    
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Eine Liste von Bestellungen, einschließlich Details wie Kunde, Geschäftspartner, Titel, Status und Erstellungsdatum.</div>
+    <div class="response">
+      <pre>[
+  {
+    <span class="key">"id"</span>: <span class="number">1</span>,
+    <span class="key">"customer_user"</span>: <span class="number">1</span>,
+    <span class="key">"business_user"</span>: <span class="number">2</span>,
+    <span class="key">"title"</span>: <span class="string">"Logo Design"</span>,
+    <span class="key">"revisions"</span>: <span class="number">3</span>,
+    <span class="key">"delivery_time_in_days"</span>: <span class="number">5</span>,
+    <span class="key">"price"</span>: <span class="number">150</span>,
+    <span class="key">"features"</span>: [
+      <span class="string">"Logo Design"</span>,
+      <span class="string">"Visitenkarten"</span>
+    ],
+    <span class="key">"offer_type"</span>: <span class="string">"basic"</span>,
+    <span class="key">"status"</span>: <span class="string">"in_progress"</span>,
+    <span class="key">"created_at"</span>: <span class="string">"2024-09-29T10:00:00Z"</span>,
+    <span class="key">"updated_at"</span>: <span class="string">"2024-09-30T12:00:00Z"</span>
+  }
+]</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Die Liste der Bestellungen wurde erfolgreich abgerufen.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein.</div>
+    <div class="extra-information"><strong>Extra Information:</strong> Dieser Endpunkt gibt nur Bestellungen zurück, die mit dem angemeldeten Benutzer entweder als Kunde oder als Geschäftspartner verbunden sind.</div>
+  
+    </div>
+  </div><div class="endpoint-container" data-index="3-1">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="3-1">
+      <div class="endpoint-checkbox" data-index="3-1" onclick="updateBackgroundColor('3-1', event)"> 
+        <input type="checkbox" class="checkbox" data-index="3-1">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-post">POST</p>
+        <h3>/api/orders/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Erstellt eine neue Bestellung basierend auf den Details eines Angebots (OfferDetail).
+    </div>
+    
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"offer_detail_id"</span>: <span class="number">1</span>
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Die erstellte Bestellung wird zurückgegeben, einschließlich Details wie ID, Kunde, Geschäftspartner, Titel, Preis und Status.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"id"</span>: <span class="number">1</span>,
+  <span class="key">"customer_user"</span>: <span class="number">1</span>,
+  <span class="key">"business_user"</span>: <span class="number">2</span>,
+  <span class="key">"title"</span>: <span class="string">"Logo Design"</span>,
+  <span class="key">"revisions"</span>: <span class="number">3</span>,
+  <span class="key">"delivery_time_in_days"</span>: <span class="number">5</span>,
+  <span class="key">"price"</span>: <span class="number">150</span>,
+  <span class="key">"features"</span>: [
+    <span class="string">"Logo Design"</span>,
+    <span class="string">"Visitenkarten"</span>
+  ],
+  <span class="key">"offer_type"</span>: <span class="string">"basic"</span>,
+  <span class="key">"status"</span>: <span class="string">"in_progress"</span>,
+  <span class="key">"created_at"</span>: <span class="string">"2024-09-29T10:00:00Z"</span>,
+  <span class="key">"updated_at"</span>: <span class="string">"2024-09-30T12:00:00Z"</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>201:</strong> Die Bestellung wurde erfolgreich erstellt.</li>
+      
+        <li><strong>400:</strong> Ungültige Anfragedaten (z. B. wenn 'offer_detail_id' fehlt oder ungültig ist).</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>403:</strong> Benutzer hat keine Berechtigung, z.B. weil nicht vom typ 'customer'.</li>
+      
+        <li><strong>404:</strong> Das angegebene Angebotsdetail wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein und vom typ 'customer' sein.</div>
+    <div class="extra-information"><strong>Extra Information:</strong> Nur Benutzer vom typ 'customer' können Bestellungen erstellen. Der Benutzer gibt eine OfferDetail ID an, und die Bestellung wird auf Grundlage dieses Angebots erstellt. Beachte, dass das Angebot sowohl den Anbieter als auch den Kunden beinhalten muss. Diese Informationen können aus der Authentifizierung und der Offer entnommen werden.</div>
+  
+    </div>
+  </div><div class="endpoint-container" data-index="3-2">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="3-2">
+      <div class="endpoint-checkbox" data-index="3-2" onclick="updateBackgroundColor('3-2', event)"> 
+        <input type="checkbox" class="checkbox" data-index="3-2">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-patch">PATCH</p>
+        <h3>/api/orders/{id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Aktualisiert den Status einer spezifischen Bestellung. Mögliche Statuswerte sind z.B. 'in_progress', 'completed', oder 'cancelled'.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>id</td>
+            <td>-</td>
+            <td>Die eindeutige ID der Bestellung, die aktualisiert werden soll.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"status"</span>: <span class="string">"completed"</span>
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Die aktualisierten Details der Bestellung werden zurückgegeben, einschließlich des neuen Status und aktualisierter Timestamps.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"id"</span>: <span class="number">1</span>,
+  <span class="key">"customer_user"</span>: <span class="number">1</span>,
+  <span class="key">"business_user"</span>: <span class="number">2</span>,
+  <span class="key">"title"</span>: <span class="string">"Logo Design"</span>,
+  <span class="key">"revisions"</span>: <span class="number">3</span>,
+  <span class="key">"delivery_time_in_days"</span>: <span class="number">5</span>,
+  <span class="key">"price"</span>: <span class="number">150</span>,
+  <span class="key">"features"</span>: [
+    <span class="string">"Logo Design"</span>,
+    <span class="string">"Visitenkarten"</span>
+  ],
+  <span class="key">"offer_type"</span>: <span class="string">"basic"</span>,
+  <span class="key">"status"</span>: <span class="string">"completed"</span>,
+  <span class="key">"created_at"</span>: <span class="string">"2024-09-29T10:00:00Z"</span>,
+  <span class="key">"updated_at"</span>: <span class="string">"2024-09-30T15:00:00Z"</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Der Status der Bestellung wurde erfolgreich aktualisiert.</li>
+      
+        <li><strong>400:</strong> Ungültiger Status oder unzulässige Felder in der Anfrage.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>403:</strong> Benutzer hat keine Berechtigung, diese Bestellung zu aktualisieren.</li>
+      
+        <li><strong>404:</strong> Die angegebene Bestellung wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Nur ein Benutzer vom typ 'business' kann den Status einer Bestellung aktualisieren.</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="3-3">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="3-3">
+      <div class="endpoint-checkbox" data-index="3-3" onclick="updateBackgroundColor('3-3', event)"> 
+        <input type="checkbox" class="checkbox" data-index="3-3">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-delete">DELETE</p>
+        <h3>/api/orders/{id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Löscht eine spezifische Bestellung. Diese Aktion ist auf Admin-Benutzer (Staff) beschränkt.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>id</td>
+            <td>-</td>
+            <td>Die eindeutige ID der zu löschenden Bestellung.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält keinen Inhalt und zeigt an, dass die Bestellung erfolgreich gelöscht wurde.</div>
+    <div class="response">
+      <pre><span class="null">null</span></pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>204:</strong> Die Bestellung wurde erfolgreich gelöscht. Keine weiteren Inhalte in der Antwort.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>403:</strong> Benutzer hat keine Berechtigung, die Bestellung zu löschen.</li>
+      
+        <li><strong>404:</strong> Die angegebene Bestellung wurde nicht gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Nur Admin-Benutzer (Staff) dürfen Bestellungen löschen.</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="3-4">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="3-4">
+      <div class="endpoint-checkbox" data-index="3-4" onclick="updateBackgroundColor('3-4', event)"> 
+        <input type="checkbox" class="checkbox" data-index="3-4">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/order-count/{business_user_id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Dieser Endpunkt gibt die Anzahl der laufenden Bestellungen eines bestimmten Geschäftsnutzers (Business User) zurück. Laufende Bestellungen sind solche mit dem Status 'in_progress'.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>business_user_id</td>
+            <td>-</td>
+            <td>Die eindeutige ID des Geschäftsnutzers, dessen laufende Bestellungen gezählt werden sollen.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält die Anzahl der laufenden Bestellungen für den angegebenen Geschäftsnutzer.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"order_count"</span>: <span class="number">5</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Die Anzahl der laufenden Bestellungen wurde erfolgreich abgerufen.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>404:</strong> Kein Geschäftsnutzer mit der angegebenen ID gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein.</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="3-5">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="3-5">
+      <div class="endpoint-checkbox" data-index="3-5" onclick="updateBackgroundColor('3-5', event)"> 
+        <input type="checkbox" class="checkbox" data-index="3-5">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/completed-order-count/{business_user_id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Gibt die Anzahl der abgeschlossenen Bestellungen eines bestimmten Geschäftsnutzers zurück. Abgeschlossene Bestellungen haben den Status 'completed'.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>business_user_id</td>
+            <td>-</td>
+            <td>Die eindeutige ID des Geschäftsnutzers, dessen abgeschlossene Bestellungen gezählt werden sollen.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält die Anzahl der abgeschlossenen Bestellungen für den angegebenen Geschäftsnutzer.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"completed_order_count"</span>: <span class="number">10</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Die Anzahl der abgeschlossenen Bestellungen wurde erfolgreich abgerufen.</li>
+      
+        <li><strong>401:</strong> Benutzer ist nicht authentifiziert.</li>
+      
+        <li><strong>404:</strong> Kein Geschäftsnutzer mit der angegebenen ID gefunden.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>Permissions required:</strong> Der Benutzer muss authentifiziert sein.</div>
+    
+  
+    </div>
+  </div></section><section class="endpoint-section">
+      <header>
+        <h2>Bewertungen (reviews)</h2>
+        <p>Alles an CRUD das für das Frontend eine Rolle spielt</p>
+      </header>
+    <div class="endpoint-container" data-index="4-0">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="4-0">
+      <div class="endpoint-checkbox" data-index="4-0" onclick="updateBackgroundColor('4-0', event)"> 
+        <input type="checkbox" class="checkbox" data-index="4-0">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/reviews/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Listet alle verfügbaren Bewertungen auf. Die Bewertungen können nach 'updated_at' oder 'rating' geordnet werden. Es können auch Filter-Parameter wie 'business_user_id' und 'reviewer_id' verwendet werden.
+    </div>
+    
+    
+    <h4>Query Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>business_user_id</td>
+            <td>integer</td>
+            <td>Die ID des Geschäftsbenutzers, für den Bewertungen gefiltert werden sollen.</td>
+          </tr>
+        
+          <tr>
+            <td>reviewer_id</td>
+            <td>integer</td>
+            <td>Die ID des Benutzers, der die Bewertungen erstellt hat.</td>
+          </tr>
+        
+          <tr>
+            <td>ordering</td>
+            <td>string</td>
+            <td>Die Sortierreihenfolge der Bewertungen. Mögliche Werte: 'updated_at' oder 'rating'.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält eine Liste aller Bewertungen, die gefiltert und geordnet werden können.</div>
+    <div class="response">
+      <pre>[
+  {
+    <span class="key">"id"</span>: <span class="number">1</span>,
+    <span class="key">"business_user"</span>: <span class="number">2</span>,
+    <span class="key">"reviewer"</span>: <span class="number">3</span>,
+    <span class="key">"rating"</span>: <span class="number">4</span>,
+    <span class="key">"description"</span>: <span class="string">"Sehr professioneller Service."</span>,
+    <span class="key">"created_at"</span>: <span class="string">"2023-10-30T10:00:00Z"</span>,
+    <span class="key">"updated_at"</span>: <span class="string">"2023-10-31T10:00:00Z"</span>
+  },
+  {
+    <span class="key">"id"</span>: <span class="number">2</span>,
+    <span class="key">"business_user"</span>: <span class="number">5</span>,
+    <span class="key">"reviewer"</span>: <span class="number">3</span>,
+    <span class="key">"rating"</span>: <span class="number">5</span>,
+    <span class="key">"description"</span>: <span class="string">"Top Qualität und schnelle Lieferung!"</span>,
+    <span class="key">"created_at"</span>: <span class="string">"2023-09-20T10:00:00Z"</span>,
+    <span class="key">"updated_at"</span>: <span class="string">"2023-09-20T12:00:00Z"</span>
+  }
+]</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Erfolgreiche Antwort mit der Liste der Bewertungen.</li>
+      
+        <li><strong>401:</strong> Unauthorized. Der Benutzer muss authentifiziert sein.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <div class="permissions"><strong>Permissions required:</strong> Jeder authentifizierte Benutzer kann Bewertungen lesen.</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="4-1">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="4-1">
+      <div class="endpoint-checkbox" data-index="4-1" onclick="updateBackgroundColor('4-1', event)"> 
+        <input type="checkbox" class="checkbox" data-index="4-1">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-post">POST</p>
+        <h3>/api/reviews/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Erstellt eine neue Bewertung für einen Geschäftsbenutzer. Nur authentifizierte Benutzer mit einem Kundenprofil dürfen Bewertungen erstellen. Ein Benutzer kann pro Geschäftsprofil nur eine Bewertung abgeben.
+    </div>
+    
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"business_user"</span>: <span class="number">2</span>,
+  <span class="key">"rating"</span>: <span class="number">4</span>,
+  <span class="key">"description"</span>: <span class="string">"Alles war toll!"</span>
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Erfolgreiche Antwort, die die Details der neu erstellten Bewertung zurückgibt.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"id"</span>: <span class="number">3</span>,
+  <span class="key">"business_user"</span>: <span class="number">2</span>,
+  <span class="key">"reviewer"</span>: <span class="number">3</span>,
+  <span class="key">"rating"</span>: <span class="number">4</span>,
+  <span class="key">"description"</span>: <span class="string">"Alles war toll!"</span>,
+  <span class="key">"created_at"</span>: <span class="string">"2023-10-30T15:30:00Z"</span>,
+  <span class="key">"updated_at"</span>: <span class="string">"2023-10-30T15:30:00Z"</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>201:</strong> Erfolgreich erstellt.</li>
+      
+        <li><strong>400:</strong> Fehlerhafte Anfrage. Der Benutzer hat möglicherweise bereits eine Bewertung für das gleiche Geschäftsprofil abgegeben.</li>
+      
+        <li><strong>401:</strong> Unauthorized. Der Benutzer muss authentifiziert sein und ein Kundenprofil besitzen.</li>
+      
+        <li><strong>403:</strong> Forbidden. Ein Benutzer kann nur eine Bewertung pro Geschäftsprofil abgeben.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <div class="permissions"><strong>Permissions required:</strong> Nur authentifizierte Benutzer mit einem Kundenprofil dürfen Bewertungen erstellen. Jeder authentifizierte Benutzer kann Bewertungen lesen.</div>
+    <div class="extra-information"><strong>Extra Information:</strong> Dieser Endpunkt erlaubt es Kunden, eine Bewertung für einen Geschäftsbenutzer zu hinterlassen. Eine Bewertung kann nur einmal pro Geschäftsbenutzer abgegeben werden.</div>
+  
+    </div>
+  </div><div class="endpoint-container" data-index="4-2">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="4-2">
+      <div class="endpoint-checkbox" data-index="4-2" onclick="updateBackgroundColor('4-2', event)"> 
+        <input type="checkbox" class="checkbox" data-index="4-2">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-patch">PATCH</p>
+        <h3>/api/reviews/{id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Aktualisiert ausgewählte Felder einer bestehenden Bewertung (nur 'rating' und 'description' sind editierbar). Der Endpunkt erlaubt es dem Ersteller der Bewertung, die Bewertung zu bearbeiten.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>id</td>
+            <td>-</td>
+            <td>Die ID der spezifischen Bewertung, die aktualisiert werden soll.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    <h4>Request Body</h4>
+    <pre>{
+  <span class="key">"rating"</span>: <span class="number">5</span>,
+  <span class="key">"description"</span>: <span class="string">"Noch besser als erwartet!"</span>
+}</pre>
+  
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält die aktualisierten Details der Bewertung.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"id"</span>: <span class="number">1</span>,
+  <span class="key">"business_user"</span>: <span class="number">2</span>,
+  <span class="key">"reviewer"</span>: <span class="number">3</span>,
+  <span class="key">"rating"</span>: <span class="number">5</span>,
+  <span class="key">"description"</span>: <span class="string">"Noch besser als erwartet!"</span>,
+  <span class="key">"created_at"</span>: <span class="string">"2023-10-30T10:00:00Z"</span>,
+  <span class="key">"updated_at"</span>: <span class="string">"2023-11-01T08:00:00Z"</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Erfolgreich aktualisiert. Die aktualisierte Bewertung wird zurückgegeben.</li>
+      
+        <li><strong>400:</strong> Bad Request. Der Anfrage-Body enthält ungültige Daten.</li>
+      
+        <li><strong>401:</strong> Unauthorized. Der Benutzer muss authentifiziert sein.</li>
+      
+        <li><strong>403:</strong> Forbidden. Der Benutzer ist nicht berechtigt, diese Bewertung zu bearbeiten.</li>
+      
+        <li><strong>404:</strong> Nicht gefunden. Es wurde keine Bewertung mit der angegebenen ID gefunden.</li>
+      
+    </ul>
+  
+    
+    <div class="permissions"><strong>Permissions required:</strong> Nur der Ersteller der Bewertung darf diese Aktion durchführen.</div>
+    
+  
+    </div>
+  </div><div class="endpoint-container" data-index="4-3">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="4-3">
+      <div class="endpoint-checkbox" data-index="4-3" onclick="updateBackgroundColor('4-3', event)"> 
+        <input type="checkbox" class="checkbox" data-index="4-3">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-delete">DELETE</p>
+        <h3>/api/reviews/{id}/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Löscht eine spezifische Bewertung. Nur der Ersteller der Bewertung können diese Aktion ausführen.
+    </div>
+    
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>id</td>
+            <td>-</td>
+            <td>Die ID der spezifischen Bewertung, die gelöscht werden soll.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort bestätigt, dass die Bewertung erfolgreich gelöscht wurde.</div>
+    <div class="response">
+      <pre><span class="null">null</span></pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>204:</strong> Erfolgreich gelöscht. Es wird kein Inhalt zurückgegeben.</li>
+      
+        <li><strong>401:</strong> Unauthorized. Der Benutzer muss authentifiziert sein.</li>
+      
+        <li><strong>403:</strong> Forbidden. Der Benutzer ist nicht berechtigt, diese Bewertung zu löschen.</li>
+      
+        <li><strong>404:</strong> Nicht gefunden. Es wurde keine Bewertung mit der angegebenen ID gefunden.</li>
+      
+    </ul>
+  
+    
+    <div class="permissions"><strong>Permissions required:</strong> Nur der Ersteller der Bewertung darf diese Aktion durchführen.</div>
+    
+  
+    </div>
+  </div></section><section class="endpoint-section">
+      <header>
+        <h2>Übergreifende Endpoints</h2>
+        <p>Alle Endpoints die übergreifende z.B. aggregierende Funktionene haben</p>
+      </header>
+    <div class="endpoint-container" data-index="5-0">
+    <div onclick="toggleEndpoint(this)" class="endpoint-label" data-index="5-0">
+      <div class="endpoint-checkbox" data-index="5-0" onclick="updateBackgroundColor('5-0', event)"> 
+        <input type="checkbox" class="checkbox" data-index="5-0">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-get">GET</p>
+        <h3>/api/base-info/</h3>
+        <img src="./api-doku_files/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      
+
+    <div class="description">
+      <strong>Description:</strong> Ruft allgemeine Basisinformationen zur Plattform ab, einschließlich der Anzahl der Bewertungen, des durchschnittlichen Bewertungsergebnisses, der Anzahl der Geschäftsnutzer und der Anzahl der Angebote.
+    </div>
+    
+    
+    
+    
+    <h4>Success Response</h4>
+    <div class="description">Die Antwort enthält statistische Informationen über die Plattform.</div>
+    <div class="response">
+      <pre>{
+  <span class="key">"review_count"</span>: <span class="number">10</span>,
+  <span class="key">"average_rating"</span>: <span class="number">4.6</span>,
+  <span class="key">"business_profile_count"</span>: <span class="number">45</span>,
+  <span class="key">"offer_count"</span>: <span class="number">150</span>
+}</pre>
+    </div>
+  
+    
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      
+        <li><strong>200:</strong> Die Basisinformationen wurden erfolgreich abgerufen.</li>
+      
+        <li><strong>500:</strong> Interner Serverfehler.</li>
+      
+    </ul>
+  
+    
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      <li>No limit</li>
+    </ul>
+  
+    <div class="permissions"><strong>No Permissions required</strong></div>
+    <div class="extra-information"><strong>Extra Information:</strong> Die durchschnittliche Bewertung ('average_rating') basiert auf allen abgegebenen Bewertungen und ist auf eine Dezimalstelle gerundet</div>
+  
+    </div>
+  </div></section></main>
+    <footer>
+      <img src="./api-doku_files/da_logo.png" alt="">
+    </footer>
+  
+  <script src="./api-doku_files/script.js.Download"></script>
+
+</body></html>

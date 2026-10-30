@@ -10,18 +10,18 @@
 Coderr is a platform that connects customers with freelancers offering digital services, similar to Fiverr. This repository contains the project's Django REST API. The frontend is maintained in a separate repository.
 
 - **Frontend:** [Developer-Akademie-Backendkurs/project.Coderr](https://github.com/Developer-Akademie-Backendkurs/project.Coderr)
-- **API documentation:** [api-specs.md](.github/api-specs.md)
+- **API documentation:** [api-doku.html](api-doku.html)
 - **License:** MIT (see [LICENSE](LICENSE))
 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
-- [Project Structure](#project-structure)
-- [Frontend Configuration](#frontend-configuration)
-- [Features and Pages](#features-and-pages)
-- [Guest Logins](#guest-logins)
 - [Local Setup](#local-setup)
 - [Testing and API Usage](#testing-and-api-usage)
+- [Guest Logins](#guest-logins)
+- [Frontend Configuration](#frontend-configuration)
+- [Features and Pages](#features-and-pages)
+- [Project Structure](#project-structure)
 
 ## Project Overview
 
@@ -33,63 +33,6 @@ Coderr connects customers looking for digital services with freelancers showcasi
 | Database | SQLite is configured by default for local development; PostgreSQL can be used with a suitable deployment configuration |
 | Tests | Django test runner and `unittest`-based Django tests; Pytest is not currently configured in `requirements.txt` |
 | Frontend | Vanilla JavaScript, HTML, and CSS; see the [frontend repository](https://github.com/Developer-Akademie-Backendkurs/project.Coderr) |
-
-## Project Structure
-
-The backend lives in the root of this repository. The frontend is maintained in the separate repository linked above, so `frontend/` is not part of this checkout.
-
-```text
-Coderr-Backend/
-├── accounts_app/       # Users, profiles, login, and registration
-│   ├── api/             # API views, serializers, and account tests
-│   └── migrations/      # Database schema and seeded guest accounts
-├── core/                # Django configuration and shared API functionality
-│   └── api/             # Base information, utilities, and tests
-├── marketplace_app/     # Offers, orders, and reviews
-│   ├── api/             # Feature-specific API modules and tests
-│   └── migrations/
-├── manage.py
-├── requirements.txt
-└── db.sqlite3           # Local development database (created as needed)
-```
-
-## Frontend Configuration
-
-The frontend uses a central configuration file for API endpoints and other defaults. Depending on the frontend version, it may be located at `frontend/src/assets/config.js` or simply named `config.js`. In the linked Vanilla JavaScript frontend, it is located at `shared/scripts/config.js`.
-
-When connecting the frontend to this backend, make sure the API base URL and guest login credentials in this file match the backend configuration. Set the following page size for offer pagination:
-
-```js
-PAGE_SIZE = 3
-```
-
-The backend returns three offers per page by default and allows up to 100 items through the `page_size` query parameter.
-
-## Features and Pages
-
-The following table summarizes the main frontend pages and their functionality. The current frontend uses the generic HTML document title `Coderr/` across pages, so the page name below refers to each application's area.
-
-| Page / Area | Frontend page | Features |
-| --- | --- | --- |
-| Landing / Home | `index.html` | Discover and search services; view platform statistics |
-| Offers / Services | `offer_list.html` | Browse offers and filter or sort by delivery time and price |
-| Offer details | `offer.html` | View offer details and reviews; select Basic, Standard, or Premium tiers; place an order |
-| Orders / Profile | `own_profile.html` | View and manage personal orders and profile; available functions depend on the customer or freelancer role |
-| Login | `login.html` | Sign in with a username and password or choose a customer/freelancer guest login |
-| Registration | `registration.html` | Create a customer or freelancer account |
-
-Key API routes include `/api/login/`, `/api/registration/`, `/api/offers/`, `/api/orders/`, `/api/reviews/`, and `/api/base-info/`.
-
-## Guest Logins
-
-Running `migrate` creates two guest accounts, each with a profile and API token. They are intended for local previews and development.
-
-| Role | Username | Email | Password |
-| --- | --- | --- | --- |
-| Customer (`customer`) | `guest_customer` | `guest_customer@example.com` | `guest1234` |
-| Freelancer (`business`) | `guest_business` | `guest_business@example.com` | `guest1234` |
-
-> **Security notice:** These credentials are public and intended only for local development and demos. Replace or disable them before any public or production deployment.
 
 ## Local Setup
 
@@ -140,4 +83,63 @@ Run the test suite with Django's built-in test runner:
 python manage.py test
 ```
 
-You can test the API with a client such as Postman. Start the local server, use the routes described in the API documentation, and send a token with protected endpoints using the `Authorization: Token <token>` header.
+You can test the API with a client such as Postman. Start the local server, use the routes described in the [API documentation](api-doku.html), and send a token with protected endpoints using the `Authorization: Token <token>` header.
+
+## Guest Logins
+
+Running `migrate` creates two guest accounts, each with a profile and API token. They are intended for local previews and development.
+
+| Role | Username | Email | Password |
+| --- | --- | --- | --- |
+| Customer (`customer`) | `guest_customer` | `guest_customer@example.com` | `guest1234` |
+| Freelancer (`business`) | `guest_business` | `guest_business@example.com` | `guest1234` |
+
+> **Security notice:** These credentials are public and intended only for local development and demos. Replace or disable them before any public or production deployment.
+
+## Frontend Configuration
+
+The frontend uses a central configuration file for API endpoints and other defaults. Depending on the frontend version, it may be located at `frontend/src/assets/config.js` or simply named `config.js`. In the linked Vanilla JavaScript frontend, it is located at `shared/scripts/config.js`.
+
+When connecting the frontend to this backend, make sure the API base URL and guest login credentials in this file match the backend configuration. Set the following page size for offer pagination:
+
+```js
+PAGE_SIZE = 3
+```
+
+The backend returns three offers per page by default and allows up to 100 items through the `page_size` query parameter.
+
+## Features and Pages
+
+The following table summarizes the main frontend pages and their functionality. The current frontend uses the generic HTML document title `Coderr/` across pages, so the page name below refers to each application's area.
+
+| Page / Area | Frontend page | Features |
+| --- | --- | --- |
+| Landing / Home | `index.html` | Discover and search services; view platform statistics |
+| Offers / Services | `offer_list.html` | Browse offers and filter or sort by delivery time and price |
+| Offer details | `offer.html` | View offer details and reviews; select Basic, Standard, or Premium tiers; place an order |
+| Orders / Profile | `own_profile.html` | View and manage personal orders and profile; available functions depend on the customer or freelancer role |
+| Login | `login.html` | Sign in with a username and password or choose a customer/freelancer guest login |
+| Registration | `registration.html` | Create a customer or freelancer account |
+
+Key API routes include `/api/login/`, `/api/registration/`, `/api/profile/<id>/`, `/api/profiles/business/`, `/api/profiles/customer/`, `/api/offers/`, `/api/offerdetails/<id>/`, `/api/orders/`, `/api/reviews/`, and `/api/base-info/`.
+
+## Project Structure
+
+The backend lives in the root of this repository. The frontend is maintained in the separate repository linked above, so `frontend/` is not part of this checkout.
+
+```text
+Coderr-Backend/
+├── auth_app/        # Custom user model, registration, and login
+├── profile_app/     # User profiles and seeded guest accounts
+├── offers_app/      # Offers, offer details, filtering, and pagination
+├── orders_app/      # Orders and order counts
+├── reviews_app/     # Reviews
+├── base_app/        # Platform statistics (base-info)
+├── core/            # Django settings, URL configuration, and shared utilities
+├── api-doku.html    # API documentation
+├── manage.py
+├── requirements.txt
+└── db.sqlite3       # Local development database (created as needed)
+```
+
+Each app keeps its API code (views, serializers, URLs) in an `api/` subfolder.

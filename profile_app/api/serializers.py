@@ -32,7 +32,7 @@ class ProfileBaseSerializer(APIModelSerializer):
 class ProfileDetailSerializer(ProfileBaseSerializer):
     """Serialize the complete profile including email and creation time."""
 
-    email = serializers.EmailField(source='user.email')
+    email = serializers.EmailField(source='user.email', read_only=True)
 
     class Meta:
         """Expose the full profile field set."""

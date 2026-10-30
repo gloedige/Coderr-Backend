@@ -74,11 +74,12 @@ class ProfileUpdateSerializer(serializers.Serializer):
 
     def update_profile(self):
         """Apply validated changes atomically and return the updated profile."""
-        profile, user = self.context['profile'], self.context['user']
+        profile = self.context['profile']
+        user = profile.user
         data = dict(self.validated_data)
+        print(f"Validated data: {data}")
         email = data.pop('email', None)
-        profile.user = user
-        profile.email = email if email is not None else profile.email
+        print(f"Email: {email}")
         file_value = data.pop('file', serializers.empty)
         previous_file = profile.file
         try:

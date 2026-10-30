@@ -1,5 +1,3 @@
-import email
-
 from django.db import models
 from auth_app.models import User
 
@@ -17,7 +15,6 @@ class Profile(models.Model):
     tel = models.CharField(max_length=50, blank=True, default='')
     description = models.CharField(max_length=500, blank=True, default='')
     working_hours = models.CharField(max_length=255, blank=True, default='')
-    email = models.EmailField(max_length=254, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

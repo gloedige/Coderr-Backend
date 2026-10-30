@@ -51,9 +51,9 @@ class ProfileUpdateSerializer(serializers.Serializer):
     last_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
     location = serializers.CharField(max_length=255, required=False, allow_blank=True)
     tel = serializers.CharField(max_length=50, required=False, allow_blank=True)
-    email = serializers.EmailField(max_length=254, required=False)
     description = serializers.CharField(max_length=500, required=False, allow_blank=True)
     working_hours = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    email = serializers.EmailField(max_length=254, required=False)              
     file = serializers.FileField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
@@ -74,7 +74,8 @@ class ProfileUpdateSerializer(serializers.Serializer):
 
     def update_profile(self):
         """Apply validated changes atomically and return the updated profile."""
-        profile, user = self.context['profile'], self.context['user']
+        profile = self.context['profile']
+        user = profile.user
         data = dict(self.validated_data)
         email = data.pop('email', None)
         file_value = data.pop('file', serializers.empty)

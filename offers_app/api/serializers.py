@@ -42,6 +42,12 @@ class OfferDetailWriteSerializer(serializers.Serializer):
         child=serializers.CharField(allow_blank=True), required=False, allow_empty=True
     )
 
+    def validate(self, attrs):
+        """Require offer_type even in partial mode, which skips required checks."""
+        if 'offer_type' not in attrs:
+            raise serializers.ValidationError({'offer_type': 'This field is required.'})
+        return attrs
+
 
 class OfferMultipartSerializer(serializers.Serializer):
     """Base for offer write serializers accepting JSON or multipart input."""

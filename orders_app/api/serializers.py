@@ -1,8 +1,10 @@
+# Third-party
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, ValidationError
 
+# Local imports
 from core.serializers import APIModelSerializer
 from offers_app.models import OfferDetail
 from orders_app.models import Order

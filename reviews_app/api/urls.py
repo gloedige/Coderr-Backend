@@ -1,6 +1,8 @@
+# Third-party
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
+# Local imports
 from reviews_app.api.views import ReviewViewSet
 
 app_name = 'reviews_api'

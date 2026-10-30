@@ -1,3 +1,4 @@
+# Third-party
 from django.db import transaction
 from rest_framework import status
 from rest_framework.exceptions import APIException
@@ -5,6 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+# Local imports
 from auth_app.api.serializers import LoginSerializer, RegistrationSerializer
 from core.utils import internal_error_response
 

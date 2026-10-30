@@ -1,27 +1,21 @@
+# Third-party
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status, viewsets
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+# Local imports
 from auth_app.models import User
 from core.utils import handle_internal_errors
+from orders_app.api.permissions import IsAssignedBusinessUser, IsCustomerUser
 from orders_app.api.serializers import (
     OrderCreateSerializer,
     OrderReadSerializer,
     OrderStatusUpdateSerializer,
 )
 from orders_app.models import Order
-
-
-class IsCustomerUser(IsAuthenticated):
-    """Allow only authenticated users with the customer role."""
-
-    def has_permission(self, request, view):
-        """Return True for authenticated customers."""
-        return super().has_permission(request, view) and request.user.type == User.UserType.CUSTOMER
 
 
 class OrderViewSet(
@@ -49,9 +43,11 @@ class OrderViewSet(
         )
 
     def get_permissions(self):
-        """Return role-specific permissions for create and destroy."""
+        """Return role-specific permissions for create, update, and destroy."""
         if self.action == 'create':
             return [IsAuthenticated(), IsCustomerUser()]
+        if self.action == 'partial_update':
+            return [IsAuthenticated(), IsAssignedBusinessUser()]
         if self.action == 'destroy':
             return [IsAuthenticated(), IsAdminUser()]
         return [permission() for permission in self.permission_classes]
@@ -77,8 +73,6 @@ class OrderViewSet(
     def partial_update(self, request, *args, **kwargs):
         """Update an order status as its assigned business user."""
         order = self.get_object()
-        if order.business_user_id != request.user.pk or request.user.type != User.UserType.BUSINESS:
-            raise PermissionDenied('Only the assigned business user may update this order.')
         serializer = OrderStatusUpdateSerializer(data=request.data, context={'order': order})
         serializer.is_valid(raise_exception=True)
         return self.save_status(serializer)

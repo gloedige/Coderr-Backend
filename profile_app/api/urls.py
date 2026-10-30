@@ -1,5 +1,7 @@
+# Third-party
 from django.urls import path
 
+# Local imports
 from profile_app.api.views import (
     BusinessProfileListView,
     CustomerProfileListView,

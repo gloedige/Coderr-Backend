@@ -1,6 +1,8 @@
+# Third-party
 from django.conf import settings
 from django.db import models
 
+# Local imports
 from offers_app.models import OfferDetail
 
 class Order(models.Model):

@@ -1,10 +1,12 @@
+# Third-party
 from rest_framework import mixins, status, viewsets
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from auth_app.models import User
+# Local imports
 from core.utils import handle_internal_errors
+from reviews_app.api.permissions import IsCustomerUser, IsReviewCreatorOrReadOnly
 from reviews_app.api.serializers import (
     ReviewCreateSerializer,
     ReviewReadSerializer,
@@ -36,8 +38,14 @@ class ReviewViewSet(
     queryset = Review.objects.select_related('business_user', 'reviewer')
     serializer_class = ReviewReadSerializer
     lookup_value_regex = r'\d+'
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsReviewCreatorOrReadOnly)
     http_method_names = ('get', 'post', 'patch', 'delete', 'head', 'options')
+
+    def get_permissions(self):
+        """Require the customer role for create; otherwise use the default permissions."""
+        if self.action == 'create':
+            return [IsAuthenticated(), IsCustomerUser()]
+        return super().get_permissions()
 
     def get_serializer_class(self):
         """Return the write serializer for create and the read serializer otherwise."""
@@ -97,9 +105,7 @@ class ReviewViewSet(
         return super().list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-        """Create a review after enforcing customer role and eligibility."""
-        if request.user.type != User.UserType.CUSTOMER:
-            raise PermissionDenied('Only customer users may create reviews.')
+        """Create a review after validating the request data."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return self.save_review(serializer)
@@ -113,7 +119,6 @@ class ReviewViewSet(
     def partial_update(self, request, *args, **kwargs):
         """Partially update a review when requested by its creator."""
         review = self.get_object()
-        self.require_review_creator(review)
         serializer = ReviewUpdateSerializer(
             data=request.data, context={'review': review}, partial=True
         )
@@ -127,14 +132,7 @@ class ReviewViewSet(
 
     def destroy(self, request, *args, **kwargs):
         """Delete the review if owned by the requester, returning 204."""
-        review = self.get_object()
-        self.require_review_creator(review)
-        return self.delete_review(review)
-
-    def require_review_creator(self, review):
-        """Verify the requester owns the review before a mutation."""
-        if review.reviewer_id != self.request.user.pk:
-            raise PermissionDenied('Only the review creator may modify this review.')
+        return self.delete_review(self.get_object())
 
     @handle_internal_errors('Review deletion failed due to an internal error.')
     def delete_review(self, review):

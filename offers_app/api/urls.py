@@ -1,6 +1,8 @@
+# Third-party
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
+# Local imports
 from offers_app.api.views import OfferDetailView, OfferViewSet
 
 app_name = 'offers_api'

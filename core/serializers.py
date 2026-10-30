@@ -1,6 +1,8 @@
+# Third-party
 from django.db import models
 from rest_framework import serializers
 
+# Local imports
 from core.datetime_fields import UTCDateTimeField
 
 

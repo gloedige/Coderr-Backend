@@ -1,7 +1,9 @@
+# Standard library
 import json
 import logging
 from functools import wraps
 
+# Third-party
 from django.db import transaction
 from PIL import Image, UnidentifiedImageError
 from rest_framework import serializers, status

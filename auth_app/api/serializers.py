@@ -1,8 +1,10 @@
+# Third-party
 from django.contrib.auth import authenticate, get_user_model
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
+# Local imports
 from profile_app.models import Profile
 
 

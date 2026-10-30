@@ -1,9 +1,13 @@
+# Standard library
 from decimal import Decimal
 
+# Third-party
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, ValidationError
 
+# Local imports
+from core.serializers import APIModelSerializer
 from core.utils import (
     decode_json_field,
     file_basename,
@@ -11,7 +15,6 @@ from core.utils import (
     schedule_replaced_file_deletion,
     validate_image_upload,
 )
-from core.serializers import APIModelSerializer
 from offers_app.models import Offer, OfferDetail
 
 

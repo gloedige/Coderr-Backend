@@ -1,6 +1,4 @@
-from django.test import TestCase
-
-# Create your tests here.
+# Standard library
 import json
 from decimal import Decimal
 from io import BytesIO
@@ -8,12 +6,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import PropertyMock, patch
 
+# Third-party
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.test import TestCase, override_settings
 from PIL import Image
 from rest_framework.test import APIClient
 
+# Local imports
 from offers_app.models import Offer, OfferDetail
 
 

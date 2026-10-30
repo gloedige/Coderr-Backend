@@ -1,20 +1,22 @@
+# Standard library
 from datetime import datetime, timedelta, timezone
 
+# Third-party
 from django.db import models
 from django.test import SimpleTestCase
 from rest_framework import serializers
 
-from profile_app.api.serializers import (
-    CustomerProfileListSerializer,
-    ProfileDetailSerializer,
-)
+# Local imports
 from core.datetime_fields import UTCDateTimeField
 from offers_app.api.serializers import (
     OfferDetailReadOnlySerializer,
     OfferListSerializer,
 )
-
 from orders_app.api.serializers import OrderReadSerializer
+from profile_app.api.serializers import (
+    CustomerProfileListSerializer,
+    ProfileDetailSerializer,
+)
 from reviews_app.api.serializers import ReviewReadSerializer
 
 

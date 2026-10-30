@@ -1,10 +1,13 @@
+# Standard library
 from decimal import Decimal
 from unittest.mock import PropertyMock, patch
 
+# Third-party
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 
+# Local imports
 from offers_app.models import Offer, OfferDetail
 from orders_app.models import Order
 

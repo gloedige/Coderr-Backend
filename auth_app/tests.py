@@ -1,11 +1,14 @@
+# Standard library
 from unittest.mock import patch
 
+# Third-party
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.test import TestCase
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
+# Local imports
 from profile_app.models import Profile
 
 

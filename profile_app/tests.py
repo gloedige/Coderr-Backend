@@ -1,12 +1,15 @@
+# Standard library
 from io import BytesIO
 from tempfile import TemporaryDirectory
 from unittest.mock import PropertyMock, patch
 
+# Third-party
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from PIL import Image
 from rest_framework.test import APIClient
 
+# Local imports
 from profile_app.models import Profile
 
 

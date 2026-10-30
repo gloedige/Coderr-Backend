@@ -1,6 +1,8 @@
+# Standard library
 from decimal import Decimal
 from typing import ClassVar
 
+# Third-party
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -19,6 +21,11 @@ class Offer(models.Model):
 	description = models.CharField(max_length=500, blank=True, default='')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		"""Order offers by most recent update with the primary key as tiebreaker."""
+
+		ordering = ('-updated_at', 'pk')
 
 	def __str__(self):
 		"""Return the offer title."""

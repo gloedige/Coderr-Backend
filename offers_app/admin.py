@@ -1,3 +1,7 @@
+# Third-party
 from django.contrib import admin
 
-# Register your models here.
+# Local imports
+from offers_app.models import Offer
+
+admin.site.register(Offer)

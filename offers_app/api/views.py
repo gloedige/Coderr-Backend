@@ -1,8 +1,7 @@
 from decimal import Decimal, InvalidOperation
 
 from django.db.models import OuterRef, Q, Subquery
-from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -181,15 +180,16 @@ class OfferViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class OfferDetailViewSet(viewsets.ViewSet):
+class OfferDetailView(generics.RetrieveAPIView):
     """Retrieve single offer details."""
 
+    queryset = OfferDetail.objects.select_related('offer')
+    serializer_class = OfferDetailReadSerializer
     permission_classes = (IsAuthenticated,)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, *args, **kwargs):
         """Return the offer detail `pk` or 404."""
-        detail = get_object_or_404(OfferDetail.objects.select_related('offer'), pk=pk)
-        return self.detail_response(detail)
+        return self.detail_response(self.get_object())
 
     @handle_internal_errors('Offer detail retrieval failed due to an internal error.')
     def detail_response(self, detail):

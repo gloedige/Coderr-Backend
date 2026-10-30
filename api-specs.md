@@ -1,6 +1,6 @@
 # Coderr API-Spezifikation
 
-Diese Spezifikation wurde aus [api-doku.html](../api-doku.html) abgeleitet und um die abgestimmten Implementierungsregeln ergänzt. Sie beschreibt alle Endpunkte, Antwortformate, Berechtigungen und Validierungsregeln.
+Diese Spezifikation wurde aus der nicht versionierten Datei `api-doku.html` abgeleitet und um die abgestimmten Implementierungsregeln ergänzt. Sie beschreibt alle Endpunkte, Antwortformate, Berechtigungen und Validierungsregeln.
 
 ## Allgemeines
 

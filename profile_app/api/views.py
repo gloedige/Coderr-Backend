@@ -1,11 +1,12 @@
 # Third-party
 from rest_framework import generics
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 # Local imports
 from auth_app.models import User
 from core.utils import handle_internal_errors
+from profile_app.api.permissions import IsProfileOwnerOrReadOnly
 from profile_app.api.serializers import (
     BusinessProfileListSerializer,
     CustomerProfileListSerializer,
@@ -19,6 +20,7 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     """Retrieve any profile and let owners partially update their own."""
 
     serializer_class = ProfileDetailSerializer
+    permission_classes = (IsAuthenticated, IsProfileOwnerOrReadOnly)
     lookup_field = 'user_id'
     lookup_url_kwarg = 'pk'
     http_method_names = ('get', 'patch', 'head', 'options')
@@ -39,8 +41,6 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     def partial_update(self, request, *args, **kwargs):
         """Update the requester's own profile and return the updated profile."""
         profile = self.get_object()
-        if profile.user_id != request.user.pk:
-            raise PermissionDenied('You may only update your own profile.')
         serializer = ProfileUpdateSerializer(
             data=request.data,
             context={'profile': profile, 'user': request.user},

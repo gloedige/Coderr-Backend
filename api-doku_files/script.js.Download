@@ -1,0 +1,271 @@
+function getUrlParameter() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("name") || "Coderrs";
+}
+
+const fileName = getUrlParameter();
+
+async function getAndRenderDocu() {
+  fetch(`./${fileName}.doku.json`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((dataJson) => {
+      renderDocumentation(dataJson);
+    })
+    .catch((error) => console.error("Failed to load JSON:", error));
+}
+
+let savedStates = {};
+
+function syntaxHighlight(json) {
+  if (typeof json !== "string") {
+    json = JSON.stringify(json, null, 2);
+  }
+
+  function formatValue(value, indentLevel = 0) {
+    const indent = "  ".repeat(indentLevel);
+    const nextIndent = "  ".repeat(indentLevel + 1);
+
+    if (Array.isArray(value)) {
+      return `[\n${value
+        .map((val) => `${nextIndent}${formatValue(val, indentLevel + 1)}`)
+        .join(",\n")}\n${indent}]`;
+    } else if (value && typeof value === "object") {
+      return `{\n${Object.entries(value)
+        .map(
+          ([key, val]) =>
+            `${nextIndent}<span class="key">"${key}"</span>: ${formatValue(
+              val,
+              indentLevel + 1
+            )}`
+        )
+        .join(",\n")}\n${indent}}`;
+    } else if (typeof value === "string") {
+      return `<span class="string">"${value}"</span>`;
+    } else if (typeof value === "number") {
+      return `<span class="number">${value}</span>`;
+    } else if (typeof value === "boolean") {
+      return `<span class="boolean">${value}</span>`;
+    } else if (value === null) {
+      return `<span class="null">null</span>`;
+    }
+    return value;
+  }
+
+  const formatted = JSON.parse(json);
+  return formatValue(formatted);
+}
+
+
+
+function renderDocumentation(data) {
+  const container = document.getElementById("endpoints");
+  const titleRef = document.getElementById("docu_title");
+  titleRef.innerText = fileName;
+
+  const nameParam = getUrlParameter();
+  const storedStates = JSON.parse(localStorage.getItem("checkboxStates")) || {};
+  savedStates = storedStates[nameParam] || {};
+
+  data.forEach((section, sectionIndex) => {
+    const sectionDiv = document.createElement("section");
+    sectionDiv.className = "endpoint-section";
+    sectionDiv.innerHTML = `
+      <header>
+        <h2>${section.title}</h2>
+        <p>${section.description}</p>
+      </header>
+    `;
+
+    section.endpoints.forEach((endpoint, index) => {
+      let endpointDiv = createEndpointHTML(endpoint, sectionIndex, index);
+      sectionDiv.appendChild(endpointDiv);
+    });
+
+    container.appendChild(sectionDiv);
+  });
+}
+
+
+
+function createEndpointHTML(endpoint, sectionIndex, endpointIndex) {
+  const endpointDiv = document.createElement("div");
+  endpointDiv.className = "endpoint-container";
+  endpointDiv.dataset.index = `${sectionIndex}-${endpointIndex}`;
+  
+  let endpointChecked = savedStates[endpointDiv.dataset.index] ? "checked" : "";
+  
+  endpointDiv.innerHTML = /*html*/ `
+    <div onclick="toggleEndpoint(this)" class="endpoint-label hidden" data-index="${sectionIndex}-${endpointIndex}">
+      <div class="endpoint-checkbox" data-index="${sectionIndex}-${endpointIndex}" onclick="updateBackgroundColor('${sectionIndex}-${endpointIndex}', event)"> 
+        <input ${endpointChecked} type="checkbox" class="checkbox" data-index="${sectionIndex}-${endpointIndex}">
+      </div>
+
+      <div class="endpoint-label-header">
+        <p class="method-${endpoint.method.toLowerCase()}">${endpoint.method}</p>
+        <h3>${endpoint.path}</h3>
+        <img src="./assets/icons/arrow_drop_down.svg" alt="">
+      </div>
+    </div>
+    <div class="endpoint-content hidden">
+      ${renderEndpointDetails(endpoint)}
+    </div>
+  `;
+  
+  return endpointDiv;
+}
+
+function renderEndpointDetails(endpoint) {
+  return `
+
+    <div class="description">
+      <strong>Description:</strong> ${endpoint.description}
+    </div>
+    ${renderURLParameters(endpoint.urlParameters)}
+    ${renderQueryParameters(endpoint.queryParameters)}
+    ${renderRequestBody(endpoint.requestBody)}
+    ${renderSuccessResponse(endpoint)}
+    ${renderStatusCodes(endpoint.statusCodes)}
+    ${renderRateLimits(endpoint.rateLimits)}
+    ${renderPermissions(endpoint.permissions)}
+    ${renderExtraInformation(endpoint.extraInformation)}
+  `;
+}
+
+function renderURLParameters(urlParameters) {
+  if (!urlParameters || urlParameters.length === 0) return "";
+  return `
+    <h4>URL Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${urlParameters.map((param) => `
+          <tr>
+            <td>${param.name}</td>
+            <td>-</td>
+            <td>${param.description}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderQueryParameters(queryParameters) {
+  if (!queryParameters || queryParameters.length === 0) return "";
+  return `
+    <h4>Query Parameters</h4>
+    <table class="parameter-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${queryParameters.map((param) => `
+          <tr>
+            <td>${param.name}</td>
+            <td>${param.type}</td>
+            <td>${param.description}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+
+function renderRequestBody(requestBody) {
+  if (!requestBody) return "";
+  return `
+    <h4>Request Body</h4>
+    <pre>${syntaxHighlight(JSON.stringify(requestBody, null, 2))}</pre>
+  `;
+}
+
+function renderSuccessResponse(endpoint) {
+  return `
+    <h4>Success Response</h4>
+    <div class="description">${endpoint.responseDescr || "No description available."}</div>
+    <div class="response">
+      <pre>${syntaxHighlight(JSON.stringify(endpoint.response, null, 2))}</pre>
+    </div>
+  `;
+}
+
+function renderStatusCodes(statusCodes) {
+  if (!statusCodes) return "";
+  return `
+    <h4>Status Codes</h4>
+    <ul class="status-codes">
+      ${Object.entries(statusCodes).map(([code, description]) => `
+        <li><strong>${code}:</strong> ${description}</li>
+      `).join("")}
+    </ul>
+  `;
+}
+
+function renderRateLimits(rateLimits) {
+  if (!rateLimits) return "";
+  return `
+    <h4>Rate Limits</h4>
+    <ul class="rate-limits">
+      ${rateLimits.noLimit ? `<li>No limit</li>` : `
+        <li><strong>Limit:</strong> ${rateLimits.limit}</li>
+        <li><strong>Time Window:</strong> ${rateLimits.timeWindow}</li>
+      `}
+    </ul>
+  `;
+}
+
+function renderPermissions(permissions) {
+  if (!permissions) return `<div class="permissions"><strong>No Permissions required</strong></div>`;
+  return `<div class="permissions"><strong>Permissions required:</strong> ${permissions}</div>`;
+}
+
+function renderExtraInformation(extraInformation) {
+  if (!extraInformation) return "";
+  return `<div class="extra-information"><strong>Extra Information:</strong> ${extraInformation}</div>`;
+}
+
+
+function toggleEndpoint(element) {
+  if (element) {
+    element.classList.toggle("hidden");
+  }
+}
+
+function updateBackgroundColor(index, event) {
+  event.stopPropagation();
+
+  const checkboxContainer = event.currentTarget;
+  const checkbox = checkboxContainer.querySelector(`input.checkbox[data-index="${index}"]`);
+
+  if (!(event.target === checkbox)) {
+    checkbox.checked = !checkbox.checked;
+  }
+
+  const nameParam = getUrlParameter();
+  let storedStates = JSON.parse(localStorage.getItem("checkboxStates")) || {};
+
+  if (!storedStates[nameParam]) {
+    storedStates[nameParam] = {};
+  }
+
+  storedStates[nameParam][index] = checkbox.checked;
+  localStorage.setItem("checkboxStates", JSON.stringify(storedStates));
+}
+
+

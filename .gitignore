@@ -224,10 +224,6 @@ __marimo__/
 #Refernce project files
 _reference/
 
-#API html Doku
-/api-doku_files
-api-doku.html
-
 # md-files
 .github/
 .vscode/

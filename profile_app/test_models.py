@@ -1,5 +1,7 @@
+# Third-party
 from django.test import TestCase
 
+# Local imports
 from auth_app.models import User
 from profile_app.models import Profile
 

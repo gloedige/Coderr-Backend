@@ -1,14 +1,17 @@
+# Standard library
 from decimal import Decimal, ROUND_HALF_UP
 
+# Third-party
 from django.db.models import Avg
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+# Local imports
 from auth_app.models import User
-from profile_app.models import Profile
 from core.utils import internal_error_response
 from offers_app.models import Offer
+from profile_app.models import Profile
 from reviews_app.models import Review
 
 

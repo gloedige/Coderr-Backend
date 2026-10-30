@@ -1,6 +1,8 @@
+# Third-party
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 
+# Local imports
 from auth_app.models import User
 
 

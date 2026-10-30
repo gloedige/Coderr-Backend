@@ -1,9 +1,10 @@
+# Third-party
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from rest_framework import serializers
 
-from profile_app.models import Profile
+# Local imports
 from core.serializers import APIModelSerializer
 from core.utils import (
     file_basename,
@@ -11,6 +12,7 @@ from core.utils import (
     schedule_replaced_file_deletion,
     validate_image_upload,
 )
+from profile_app.models import Profile
 
 
 User = get_user_model()

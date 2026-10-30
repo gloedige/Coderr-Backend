@@ -1,11 +1,14 @@
+# Standard library
 from decimal import Decimal, InvalidOperation
 
+# Third-party
 from django.db.models import OuterRef, Q, Subquery
 from rest_framework import generics, status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+# Local imports
 from core.utils import handle_internal_errors, schedule_replaced_file_deletion
 from offers_app.api.pagination import OfferPagination
 from offers_app.api.permissions import IsBusinessUser, IsOfferOwnerOrReadOnly

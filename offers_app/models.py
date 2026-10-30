@@ -1,6 +1,8 @@
+# Standard library
 from decimal import Decimal
 from typing import ClassVar
 
+# Third-party
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models

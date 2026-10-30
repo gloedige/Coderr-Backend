@@ -1,6 +1,8 @@
+# Third-party
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
+# Local imports
 from orders_app.api.views import (
 	CompletedOrderCountView,
 	OrderCountView,

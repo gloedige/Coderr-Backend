@@ -1,7 +1,9 @@
+# Third-party
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
+# Local imports
 from core.serializers import APIModelSerializer
 from orders_app.models import Order
 from reviews_app.models import Review

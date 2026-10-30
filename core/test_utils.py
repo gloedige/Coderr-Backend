@@ -1,10 +1,13 @@
+# Standard library
 from unittest.mock import MagicMock
 
+# Third-party
 from django.http import QueryDict
 from django.test import SimpleTestCase
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+# Local imports
 from core.utils import (
     decode_json_field,
     file_basename,

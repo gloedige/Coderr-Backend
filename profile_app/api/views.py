@@ -1,16 +1,18 @@
+# Third-party
 from rest_framework import generics
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
+# Local imports
+from auth_app.models import User
+from core.utils import handle_internal_errors
 from profile_app.api.serializers import (
     BusinessProfileListSerializer,
     CustomerProfileListSerializer,
     ProfileDetailSerializer,
     ProfileUpdateSerializer,
 )
-from auth_app.models import User
 from profile_app.models import Profile
-from core.utils import handle_internal_errors
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):

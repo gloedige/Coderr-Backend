@@ -1,3 +1,4 @@
+# Third-party
 from django.conf import settings
 from django.test import SimpleTestCase
 from rest_framework.permissions import IsAuthenticated

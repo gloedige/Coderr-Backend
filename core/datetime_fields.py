@@ -1,5 +1,7 @@
+# Standard library
 from datetime import timezone
 
+# Third-party
 from rest_framework import serializers
 
 

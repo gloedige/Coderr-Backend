@@ -1,11 +1,14 @@
+# Standard library
 from unittest.mock import patch
 
+# Third-party
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from profile_app.models import Profile
+# Local imports
 from offers_app.models import Offer
+from profile_app.models import Profile
 from reviews_app.models import Review
 
 

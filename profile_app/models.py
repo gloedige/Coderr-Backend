@@ -1,4 +1,7 @@
+# Third-party
 from django.db import models
+
+# Local imports
 from auth_app.models import User
 
 class Profile(models.Model):

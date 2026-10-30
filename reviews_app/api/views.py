@@ -1,8 +1,10 @@
+# Third-party
 from rest_framework import mixins, status, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+# Local imports
 from auth_app.models import User
 from core.utils import handle_internal_errors
 from reviews_app.api.serializers import (

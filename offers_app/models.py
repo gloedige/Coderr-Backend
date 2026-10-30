@@ -22,6 +22,11 @@ class Offer(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 
+	class Meta:
+		"""Order offers by most recent update with the primary key as tiebreaker."""
+
+		ordering = ('-updated_at', 'pk')
+
 	def __str__(self):
 		"""Return the offer title."""
 		return self.title

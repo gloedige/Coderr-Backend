@@ -20,6 +20,13 @@ class Profile(models.Model):
     working_hours = models.CharField(max_length=255, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        """Order profiles by owner and set readable admin names."""
+
+        ordering = ('user_id',)
+        verbose_name = 'profile'
+        verbose_name_plural = 'profiles'
+
     def __str__(self):
         """Return the owning username followed by 'profile'."""
         return f'{self.user.username} profile'

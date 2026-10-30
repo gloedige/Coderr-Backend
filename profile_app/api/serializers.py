@@ -53,7 +53,7 @@ class ProfileUpdateSerializer(serializers.Serializer):
     tel = serializers.CharField(max_length=50, required=False, allow_blank=True)
     description = serializers.CharField(max_length=500, required=False, allow_blank=True)
     working_hours = serializers.CharField(max_length=255, required=False, allow_blank=True)
-    email = serializers.EmailField(max_length=254, required=False, allow_blank=True)
+email = serializers.EmailField(max_length=254, required=False)
     file = serializers.FileField(required=False, allow_null=True)
 
     def to_internal_value(self, data):

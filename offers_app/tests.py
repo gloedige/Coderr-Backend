@@ -288,6 +288,20 @@ class OfferEndpointTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    def test_patch_rejects_detail_without_offer_type(self):
+        """PATCH with a detail missing offer_type yields 400, not a 500."""
+        created = self.create_offer()
+        self.client.force_authenticate(self.business)
+
+        response = self.client.patch(
+            f"/api/offers/{created['id']}/",
+            {'details': [{'title': 'No type'}]},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('offer_type', json.dumps(response.json()))
+
     def test_patch_returns_404_for_missing_offer(self):
         """PATCH on a missing offer yields 404."""
         self.client.force_authenticate(self.business)

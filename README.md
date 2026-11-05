@@ -136,7 +136,7 @@ Coderr-Backend/
 ├── reviews_app/     # Reviews
 ├── base_app/        # Platform statistics (base-info)
 ├── core/            # Django settings, URL configuration, and shared utilities
-├── instructions     # api-specs, copilot-instructions, READ_ME_instructions
+├── instructions/     # api-specs, copilot-instructions, READ_ME_instructions
 ├── manage.py
 ├── requirements.txt
 └── db.sqlite3       # Local development database (created as needed)

@@ -10,7 +10,7 @@
 Coderr is a platform that connects customers with freelancers offering digital services, similar to Fiverr. This repository contains the project's Django REST API. The frontend is maintained in a separate repository.
 
 - **Frontend:** [Developer-Akademie-Backendkurs/project.Coderr](https://github.com/Developer-Akademie-Backendkurs/project.Coderr)
-- **API documentation:** [api-specs.md](api-specs.md)
+- **API documentation:** [api-specs.md](instructions/api-specs.md)
 - **License:** MIT (see [LICENSE](LICENSE))
 
 ## Table of Contents
@@ -83,7 +83,7 @@ Run the test suite with Django's built-in test runner:
 python manage.py test
 ```
 
-You can test the API with a client such as Postman. Start the local server, use the routes described in the [API documentation](api-specs.md), and send a token with protected endpoints using the `Authorization: Token <token>` header.
+You can test the API with a client such as Postman. Start the local server, use the routes described in the [API documentation](instructions/api-specs.md), and send a token with protected endpoints using the `Authorization: Token <token>` header.
 
 ## Guest Logins
 
@@ -136,7 +136,7 @@ Coderr-Backend/
 ├── reviews_app/     # Reviews
 ├── base_app/        # Platform statistics (base-info)
 ├── core/            # Django settings, URL configuration, and shared utilities
-├── api-specs.md     # API documentation
+├── instructions     # api-specs, copilot-instructions, READ_ME_instructions
 ├── manage.py
 ├── requirements.txt
 └── db.sqlite3       # Local development database (created as needed)
